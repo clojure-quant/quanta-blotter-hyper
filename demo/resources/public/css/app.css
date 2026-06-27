@@ -563,6 +563,10 @@ tr:nth-child(even) {
   letter-spacing: -0.03em;
   padding-left: 0.15rem;
   padding-right: 0.15rem;
+  width: 27ch;
+  min-width: 27ch;
+  max-width: 27ch;
+  overflow: hidden;
 }
 
 .orders-table td.side,
@@ -581,4 +585,16 @@ tr:nth-child(even) {
 
 .orders-table td.wkg-active {
   background: #c6760a;
+}
+
+.orders-table td.status-filled {
+  background: #1a5c2a;
+}
+
+.orders-table td.status-muted {
+  background: #555;
+}
+
+.orders-table td.status-working {
+  background: #1e4a7a;
 }

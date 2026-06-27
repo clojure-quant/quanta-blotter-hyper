@@ -40,6 +40,16 @@
   [:td {:class (str "wkg" (when (pos-num? qty-working) " wkg-active"))}
    (fmt-cell qty-working)])
 
+(defn- status-cell [status]
+  [:td {:class (str "status"
+                    (case status
+                      :filled " status-filled"
+                      :rejected " status-muted"
+                      :cancelled " status-muted"
+                      :working " status-working"
+                      ""))}
+   (fmt-cell status)])
+
 (defn orders-table
   [orders]
   (let [orders (sort-by :order/date #(compare %2 %1) orders)]
@@ -77,7 +87,7 @@
            [:td.num (fmt-cell (:order/qty order))]
            (order-type-cell (:order/type order))
            [:td (fmt-cell (:order/limit order))]
-           [:td.status (fmt-cell (:order/status order))]
+           (status-cell (:order/status order))
            (wkg-cell (:order/qty-working order))
            [:td.num (fmt-pos-num (:order/qty-filled order))]
            [:td.num (when-let [avg (:order/avg-price order)] (str avg))]

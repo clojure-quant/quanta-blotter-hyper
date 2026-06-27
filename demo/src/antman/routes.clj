@@ -73,7 +73,8 @@
                                       (token/routes token)
                                       (trader-routes/routes ctx)
                                       )))
-  nil)
+  #'all-routes
+  )
 
 (defn rebuild2! []
   (if @last-ctx 
