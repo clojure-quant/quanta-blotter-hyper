@@ -1,0 +1,18 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.12.4"}
+        io.github.clojure-quant/quanta-blotter-hyper {:local/root "../quanta-blotter-hyper" :deps/manifest :deps}
+        }
+ :aliases
+ {:run {:exec-fn modular.system/start!
+        :exec-args {:config ["config.edn" "users.edn"]
+                    :services "services.edn"
+                    :profile "default"
+                    :version "prod1"}}
+  :hash-users {:exec-fn antman.users/hash-users-file!}
+  :dev {:extra-deps {io.github.tonsky/clj-reload {:mvn/version "1.0.0"}}}
+  :test {:extra-paths ["test"]
+         :extra-deps {io.github.cognitect-labs/test-runner
+                      {:git/url "https://github.com/cognitect-labs/test-runner.git"
+                       :sha "9e35c979860c75555adaff7600070c60004a0f44"}}
+         :main-opts ["-m" "cognitect.test-runner"]
+         :exec-fn cognitect.test-runner.api/test}}}

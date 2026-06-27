@@ -1,0 +1,13 @@
+{:users
+ {:admin
+  {:password "3e037862f67083f048cd1cd611adfdea",
+   :roles #{:admin},
+   :email ["admin@example.com"]},
+  :trader
+  {:password "d51c00e36622e4d8ff9a421476fbc0b3",
+   :roles #{:trader},
+   :email ["trader@example.com"]},
+  :viewer
+  {:password "2cf93d67884e1e50e65bfa71671c55ec",
+   :roles #{:viewer},
+   :email ["viewer@example.com"]}}}

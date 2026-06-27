@@ -1,0 +1,15 @@
+.nrepl-port
+.repl-history
+.cpcache
+.clj-kondo/.cache
+.lsp/.cache
+target/
+.calva/
+.portal/
+.DS_Store
+.clj-kondo/.cache
+.clj-kondo/imports
+log/
+secrets.edn
+resources/secrets.edn
+.gorilla/

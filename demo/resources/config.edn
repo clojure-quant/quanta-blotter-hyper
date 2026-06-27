@@ -1,0 +1,14 @@
+{:web-server {:port 3000}
+
+ :token
+ {:secret "change-me-in-production"
+  :auth-expiry 604800
+  :store-path ".gorilla/tokenstore"
+  :oauth2 {:google {:client-id ""
+                    :client-secret ""}
+           :github {:client-id ""
+                    :client-secret ""}}}
+
+ :timbre/clj
+ {:min-level [[#{"*"} :info]]
+  :appenders {:default {:type :console-color}}}}

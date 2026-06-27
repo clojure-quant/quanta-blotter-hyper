@@ -1,0 +1,25 @@
+{:modular (modular.system/modular-env)
+ :components
+ {:config {:start (deref (modular.config/load-config! (:config #ref [:modular])))}
+
+  :timbre {:start (modular.log/timbre-config!
+                   (:timbre/clj (clip/ref :config)))}
+
+  :token {:start (antman.auth/start-token-service! (clip/ref :config))}
+  :routes {:start (antman.routes/rebuild! (clip/ref :token))}
+
+  :sim {:start (antman.sim.state/start!)
+        :stop (antman.sim.state/stop!)}
+  :sse-heartbeat {:start (antman.sse.heartbeat/start!)
+                  :stop (antman.sse.heartbeat/stop!)}
+
+  :hyper {:start (hyper.core/start!
+                  (antman.handler/create-handler
+                   (clip/ref :routes)
+                   (clip/ref :sim)
+                   (clip/ref :sse-heartbeat))
+                  (:web-server (clip/ref :config)))
+          :stop (hyper.core/stop! this)}
+
+  :nrepl {:start (nrepl.server/start-server :bind "0.0.0.0" :port 9100)
+          :stop (.close this)}}}

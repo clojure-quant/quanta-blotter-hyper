@@ -1,0 +1,31 @@
+{"tradeId": "EURUSD-20260519-001",
+    "lifecycleId": "lc-abc123",
+    "symbol": "EURUSD",
+    "direction": "Long",
+    "status": "Open",
+    "sourceProtocol": "PineConnector",
+    "entryOrderType": "Market",
+    "requestedEntryPrice": 1.0850,
+    "filledPrice": 1.0851,
+    "initialStopPrice": 1.0800,
+    "currentStopPrice": 1.0800,
+    "takeProfits": [
+      { "level": 1, "price": 1.0900, "percent": 33.3, "hit": false },
+      { "level": 2, "price": 1.0950, "percent": 33.3, "hit": false },
+      { "level": 3, "price": 1.1000, "percent": 33.4, "hit": false }
+    ],
+    "quantity": 0.1,
+    "remainingQuantity": 0.1,
+    "remainingPct": 100.0,
+    "netR": null,
+    "openedAt": "2026-05-19T09:05:00Z",
+    "updatedAt": "2026-05-19T10:00:00Z",
+    "closedAt": null,
+    "closeReason": null,
+    "brokerRef": "MT4-10045",
+    "brokerPositionId": null,
+    "riskDecision": {
+      "outcome": "Approved",
+      "profileName": "Generic Prop Challenge",
+      "violations": []
+    }}
