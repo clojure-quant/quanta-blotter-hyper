@@ -1,0 +1,29 @@
+(ns quanta.blotter-hyper.trader.routes
+  (:require
+   [muuntaja.middleware]
+   [ring.middleware.cookies]
+   [ring.middleware.keyword-params]
+   [ring.middleware.params]
+   [token.identity.local]
+   [webserver.middleware.ctx :as ctx]
+   [antman.auth :as auth]
+   [quanta.blotter-hyper.trader.backoffice :refer [backoffice-page]]))
+
+
+(defn- with-roles
+  [required-roles route-data]
+  (assoc route-data :render-middleware [(auth/wrap-require-roles required-roles)]))
+
+
+(defn routes
+  [ctx]
+  (let [wrap-ctx (fn [handler]
+                   (ctx/wrap-ctx handler ctx))
+        wrap-identity  (fn [handler]
+                         (token.identity.local/wrap-identity handler (:token ctx)))]
+    [["/backoffice" {:name :backoffice
+                     :title "Backoffice"
+                     :get #'backoffice-page
+                     :middleware [wrap-ctx
+                                  wrap-identity]}]]))
+

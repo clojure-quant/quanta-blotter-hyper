@@ -1,4 +1,4 @@
-(ns antman.token
+(ns quanta.blotter-hyper.token
   (:require
    [muuntaja.middleware]
    [ring.middleware.cookies]

@@ -11,4 +11,9 @@
 
  :timbre/clj
  {:min-level [[#{"*"} :info]]
-  :appenders {:default {:type :console-color}}}}
+  :appenders {:default {:type :console-color}}}
+ 
+ :db {:path "/home/florian/repo/clojure-quant/quanta-blotter/demo/trade-db-oms-server"
+      :uuid #uuid "021097c6-db87-3404-9e84-215f446ef78d"}
+ 
+ }

@@ -1,18 +1,27 @@
 {:modular (modular.system/modular-env)
  :components
- {:config {:start (deref (modular.config/load-config! (:config #ref [:modular])))}
+ {;; tools
+  :config {:start (deref (modular.config/load-config! (:config #ref [:modular])))}
 
   :timbre {:start (modular.log/timbre-config!
                    (:timbre/clj (clip/ref :config)))}
 
-  :token {:start (antman.auth/start-token-service! (clip/ref :config))}
-  :routes {:start (antman.routes/rebuild! (clip/ref :token))}
+  ;; trading
+  :db {:start (quanta.blotter.oms.db/trade-db-start 
+               (:path (:db (clip/ref :config)))
+               (:uuid (:db (clip/ref :config))))
+       :stop (quanta.blotter.oms.db/trade-db-stop this)}
 
   :sim {:start (antman.sim.state/start!)
         :stop (antman.sim.state/stop!)}
+
+  ;; web
+  :ctx {:start {:db (clip/ref :db)
+                :token (clip/ref :token)}}
+  :token {:start (antman.auth/start-token-service! (clip/ref :config))}
+  :routes {:start (antman.routes/rebuild! (clip/ref :ctx))}
   :sse-heartbeat {:start (antman.sse.heartbeat/start!)
                   :stop (antman.sse.heartbeat/stop!)}
-
   :hyper {:start (hyper.core/start!
                   (antman.handler/create-handler
                    (clip/ref :routes)
@@ -21,5 +30,6 @@
                   (:web-server (clip/ref :config)))
           :stop (hyper.core/stop! this)}
 
+  ;; nrepl
   :nrepl {:start (nrepl.server/start-server :bind "0.0.0.0" :port 9100)
           :stop (.close this)}}}

@@ -1,13 +1,15 @@
 (ns antman.routes
   (:require
    [antman.auth :as auth]
-   [antman.token :as token]
+   [quanta.blotter-hyper.token :as token]
+   [quanta.blotter-hyper.trader.routes :as trader-routes]
    [antman.ui.highcharts-random-page :refer [highcharts-random-page]]
    [antman.ui.layout-page :refer [layout-page]]
    [antman.ui.panels :refer [positions-panel trades-panel]]
    [antman.ui.quotelist-page :refer [quotelist-page]]
    [antman.ui.simulator-page :refer [simulator-page]]
-   [antman.ui.trading :refer [trading-page]]))
+   [antman.ui.trading :refer [trading-page]]
+   ))
 
 (defn- with-roles
   [required-roles route-data]
@@ -61,6 +63,9 @@
   (into (vec app-routes) (token/routes nil)))
 
 (defn rebuild!
-  [token]
+  [{:keys [token] :as ctx}]
   (alter-var-root #'all-routes
-                  (constantly (into (vec app-routes) (token/routes token)))))
+                  (constantly (concat app-routes
+                                      (token/routes token)
+                                      (trader-routes/routes ctx)
+                                      ))))
