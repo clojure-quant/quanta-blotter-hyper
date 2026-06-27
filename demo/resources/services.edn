@@ -18,15 +18,13 @@
   ;; web
   :ctx {:start {:db (clip/ref :db)
                 :token (clip/ref :token)}}
-  :token {:start (antman.auth/start-token-service! (clip/ref :config))}
-  :routes {:start (antman.routes/rebuild! (clip/ref :ctx))}
+  :token {:start (quanta.blotter-hyper.auth/start-token-service! (clip/ref :config))}
   :sse-heartbeat {:start (antman.sse.heartbeat/start!)
                   :stop (antman.sse.heartbeat/stop!)}
+  :routes {:start (demo.routes/rebuild! (clip/ref :ctx))}
+  :handler {:start (demo.handler/create-handler)}
   :hyper {:start (hyper.core/start!
-                  (antman.handler/create-handler
-                   (clip/ref :routes)
-                   (clip/ref :sim)
-                   (clip/ref :sse-heartbeat))
+                  (clip/ref :handler)
                   (:web-server (clip/ref :config)))
           :stop (hyper.core/stop! this)}
 

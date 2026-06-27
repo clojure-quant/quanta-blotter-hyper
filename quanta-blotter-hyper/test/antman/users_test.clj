@@ -1,7 +1,7 @@
-(ns antman.users-test
+(ns quanta.blotter-hyper.users-test
   (:require
    [clojure.test :refer [deftest is testing]]
-   [antman.users :as users]
+   [quanta.blotter-hyper.users :as users]
    [token.identity.local :as local-identity]))
 
 (deftest hash-passwords-test

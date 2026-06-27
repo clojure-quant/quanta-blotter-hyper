@@ -6,7 +6,7 @@
                              :git/sha "d310aa4a568e41def19079ba30d1ce1b6d33607b"}
         org.pinkgorilla/token {:mvn/version "0.4.73"}
         org.pinkgorilla/webserver {:mvn/version "0.2.75"}
-        org.pinkgorilla/modular {:mvn/version "0.5.81"}
+        org.pinkgorilla/modular {:mvn/version "0.5.81"} 
         nrepl/nrepl {:mvn/version "1.2.0"}
         io.github.clojure-quant/quanta-blotter {:mvn/version "0.1.71"}}
  :aliases

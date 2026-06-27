@@ -1,4 +1,4 @@
-(ns antman.auth
+(ns quanta.blotter-hyper.auth
   (:require
    [hyper.core :as h]
    [token.core :as token]

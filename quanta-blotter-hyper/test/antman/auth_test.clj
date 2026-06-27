@@ -1,7 +1,7 @@
-(ns antman.auth-test
+(ns quanta.blotter-hyper.auth-test
   (:require
    [clojure.test :refer [deftest is testing]]
-   [antman.auth :as auth]))
+   [quanta.blotter-hyper.auth :as auth]))
 
 (deftest role-authorized-test
   (testing "separate roles — user must hold one of the required roles"

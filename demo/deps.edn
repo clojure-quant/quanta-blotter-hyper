@@ -9,7 +9,7 @@
                     :services "services.edn"
                     :profile "default"
                     :version "prod1"}}
-  :hash-users {:exec-fn antman.users/hash-users-file!}
+  :hash-users {:exec-fn quanta.blotter-hyper.users/hash-users-file!}
   :dev {:extra-paths ["dev"]
         :extra-deps {io.github.tonsky/clj-reload {:mvn/version "1.0.0"}}}
   :test {:extra-paths ["test"]

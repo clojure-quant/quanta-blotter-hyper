@@ -1,4 +1,4 @@
-(ns antman.users
+(ns quanta.blotter-hyper.users
   (:require
    [clojure.edn :as edn]
    [clojure.java.io :as io]

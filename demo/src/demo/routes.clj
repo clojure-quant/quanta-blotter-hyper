@@ -1,6 +1,6 @@
-(ns antman.routes
+(ns demo.routes
   (:require
-   [antman.auth :as auth]
+   [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.token :as token]
    [quanta.blotter-hyper.trader.routes :as trader-routes]
    [antman.ui.highcharts-random-page :refer [highcharts-random-page]]

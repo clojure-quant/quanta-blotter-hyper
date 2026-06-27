@@ -1,7 +1,7 @@
 (ns user
   (:require
    [clj-reload.core :as reload]
-   [antman.routes :refer [rebuild2!]]
+   [demo.routes :refer [rebuild2!]]
    ))
 
 #_(reload/init

@@ -6,7 +6,7 @@
    [ring.middleware.params]
    [token.identity.local]
    [webserver.middleware.ctx :as ctx]
-   [antman.auth :as auth]
+   [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.trader.backoffice :refer [backoffice-page]]))
 
 
