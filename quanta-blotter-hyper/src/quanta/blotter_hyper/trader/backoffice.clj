@@ -5,6 +5,84 @@
    [datahike.api :as d]
    [hyper.core :as h]))
 
+(def ^:private utc-fmt (t/formatter "yyyy-MM-dd HH:mm:ss.SSS"))
+
+(defn- fmt-instant-utc [v]
+  (when v
+    (t/format utc-fmt (t/in (t/instant v) t/UTC))))
+
+(defn- fmt-cell [v]
+  (cond
+    (nil? v) "—"
+    (keyword? v) (name v)
+    :else (str v)))
+
+(defn- pos-num? [n]
+  (and (some? n) (pos? (bigdec n))))
+
+(defn- fmt-pos-num [n]
+  (when (pos-num? n) (str n)))
+
+(defn- side-cell [side]
+  (case side
+    :buy [:td.side.profit "B"]
+    :sell [:td.side.loss "S"]
+    [:td.side (fmt-cell side)]))
+
+(defn- order-type-cell [order-type]
+  (case order-type
+    :stop [:td.ot "STP"]
+    :limit [:td.ot "LMT"]
+    :market [:td.ot "MKT"]
+    [:td.ot (fmt-cell order-type)]))
+
+(defn- wkg-cell [qty-working]
+  [:td {:class (str "wkg" (when (pos-num? qty-working) " wkg-active"))}
+   (fmt-cell qty-working)])
+
+(defn orders-table
+  [orders]
+  (let [orders (sort-by :order/date #(compare %2 %1) orders)]
+    [:div.orders-table-wrap
+     [:table.orders-table
+     [:thead
+      [:tr
+       [:th.time "time"]
+       [:th "acct"]
+       [:th "camp"]
+       [:th "lbl"]
+       [:th "id"]
+       [:th "asset"]
+       [:th.side-col "D"]
+       [:th.num "qty"]
+       [:th "OT"]
+       [:th "lmt"]
+       [:th "status"]
+       [:th "wkg"]
+       [:th.num "fill"]
+       [:th.num "avg"]
+       [:th "Message"]]]
+     [:tbody
+      (if (empty? orders)
+        [:tr [:td {:colspan 15} "No orders"]]
+        (for [order orders]
+          [:tr {:key (:order/id order)}
+           [:td.time (fmt-instant-utc (:order/date order))]
+           [:td (fmt-cell (:order/account-id order))]
+           [:td (fmt-cell (:order/campaign order))]
+           [:td (fmt-cell (:order/label order))]
+           [:td (fmt-cell (:order/id order))]
+           [:td (fmt-cell (:order/asset order))]
+           (side-cell (:order/side order))
+           [:td.num (fmt-cell (:order/qty order))]
+           (order-type-cell (:order/type order))
+           [:td (fmt-cell (:order/limit order))]
+           [:td.status (fmt-cell (:order/status order))]
+           (wkg-cell (:order/qty-working order))
+           [:td.num (fmt-pos-num (:order/qty-filled order))]
+           [:td.num (when-let [avg (:order/avg-price order)] (str avg))]
+           [:td (fmt-cell (:order/text order))]]))]]]))
+
 (defn query-all-orders [conn]
   (d/q '[:find [(pull ?e [*]) ...]
          :where [?e :order/id _]]
@@ -58,8 +136,9 @@
               [:motion.div
                ;(ui/nav)
                [:h1 "Backoffice"]
-               [:pre (pr-str @data-a)]
-               ;(ui/quotelist-table @quotelist)
+               (if-let [orders @data-a]
+                 (orders-table orders)
+                 [:p "Loading orders…"])
                ])
     :unmount (fn [{:keys [dispose!]}]
                (println "UNMOUNTING Backoffice-PAGE")

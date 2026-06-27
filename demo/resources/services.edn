@@ -32,4 +32,11 @@
 
   ;; nrepl
   :nrepl {:start (nrepl.server/start-server :bind "0.0.0.0" :port 9100)
-          :stop (.close this)}}}
+          :stop (.close this)}
+  
+  :reload {:start (clj-reload.core/init
+                   {:dirs ["src" "../quanta-blotter-hyper/src"]
+                    ;:no-reload '#{user}
+                    })}
+ ; 
+  }}

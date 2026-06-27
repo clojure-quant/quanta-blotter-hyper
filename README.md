@@ -10,7 +10,7 @@ Web Frontend for quanta-blotter
 
 ## Run
 
-``bash
+```bash
 cd demo
 clojure -X:run
 ```

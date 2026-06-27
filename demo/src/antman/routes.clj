@@ -62,10 +62,21 @@
 (defonce all-routes
   (into (vec app-routes) (token/routes nil)))
 
+(defonce last-ctx (atom nil))
+
 (defn rebuild!
   [{:keys [token] :as ctx}]
+  (reset! last-ctx ctx)
+  (println "rebuilding routes..")
   (alter-var-root #'all-routes
                   (constantly (concat app-routes
                                       (token/routes token)
                                       (trader-routes/routes ctx)
-                                      ))))
+                                      )))
+  nil)
+
+(defn rebuild2! []
+  (if @last-ctx 
+    (rebuild! @last-ctx)
+    (println "no last ctx, skipping rebuild")
+    ))

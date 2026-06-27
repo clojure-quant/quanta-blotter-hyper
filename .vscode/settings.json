@@ -1,0 +1,11 @@
+{
+  "calva.customREPLCommandSnippets": [
+    
+    {
+      "name": "clj-reload",
+      "key": "reload",
+      "ns": "user",
+      "snippet": "(reload)"
+    }
+  ]
+}

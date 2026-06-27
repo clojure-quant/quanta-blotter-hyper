@@ -528,3 +528,57 @@ tr:nth-child(even) {
   border: 1px solid #2d6b2d;
   border-radius: 3px;
 }
+
+.orders-table-wrap {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.orders-table {
+  font-size: 0.7rem;
+  border-collapse: collapse;
+  white-space: nowrap;
+  width: max-content;
+  table-layout: auto;
+}
+
+.orders-table th,
+.orders-table td {
+  padding: 0.1rem 0.25rem;
+  border-bottom: 1px solid #2a2a4a;
+  text-align: left;
+  width: 1%;
+}
+
+.orders-table th {
+  color: #aaa;
+  font-weight: 500;
+}
+
+.orders-table td.time,
+.orders-table th.time {
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  padding-left: 0.15rem;
+  padding-right: 0.15rem;
+}
+
+.orders-table td.side,
+.orders-table th.side-col {
+  text-align: center;
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+  font-size: 0.525rem;
+}
+
+.orders-table th.num,
+.orders-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.orders-table td.wkg-active {
+  background: #c6760a;
+}
