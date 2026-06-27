@@ -1,4 +1,4 @@
-# quanta-blotter-hyper
+# quanta-blotter-hyper [![GitHub Actions status |clojure-quant/quanta-blotter-hyper](https://github.com/clojure-quant/quanta-blotter-hyper/workflows/CI/badge.svg)](https://github.com/clojure-quant/quanta-blotter-hyper/actions?workflow=CI)[![Clojars Project](https://img.shields.io/clojars/v/io.github.clojure-quant/quanta-blotter-hyper.svg)](https://clojars.org/io.github.clojure-quant/quanta-blotter-hyper)
 
 Web Frontend for quanta-blotter
 

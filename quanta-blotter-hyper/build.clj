@@ -1,0 +1,37 @@
+(ns build
+  (:require [clojure.tools.build.api :as b]
+            [deps-deploy.deps-deploy :as dd]))
+
+(def lib 'io.github.clojure-quant/quanta-blotter-hyper)
+(def version (format "0.1.%s" (b/git-count-revs nil)))
+(def class-dir "target/classes")
+(def basis (b/create-basis {:project "deps.edn"}))
+(def jar-file (format "target/%s-%s.jar" (name lib) version))
+
+(defn clean [_]
+  (b/delete {:path "target"}))
+
+(defn jar [_]
+  (clean nil)
+  (b/copy-dir {:src-dirs ["src" "resources"] :target-dir class-dir})
+  (b/write-pom {:class-dir class-dir
+                :lib lib
+                :version version
+                :basis basis
+                :src-dirs ["src" "resources"]
+                :pom-data [[:licenses
+                            [:license
+                             [:name "Eclipse Public License 1.0"]
+                             [:url "https://www.eclipse.org/legal/epl-v10.html"]
+                             [:distribution "repo"]]]]
+                :scm {:url "https://github.com/clojure-quant/quanta-blotter-hyper"
+                      :connection "scm:git:git://github.com/clojure-quant/quanta-blotter-hyper.git"
+                      :developerConnection "scm:git:ssh://git@github.com/clojure-quant/quanta-blotter-hyper.git"
+                      :tag (str "v" version)}})
+  (b/jar {:class-dir class-dir :jar-file jar-file}))
+
+(defn deploy [_]
+  (jar nil)
+  (dd/deploy {:installer :remote
+              :artifact jar-file
+              :pom-file (b/pom-path {:lib lib :class-dir class-dir})}))

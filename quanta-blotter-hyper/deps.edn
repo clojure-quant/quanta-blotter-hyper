@@ -15,4 +15,11 @@
                       {:git/url "https://github.com/cognitect-labs/test-runner.git"
                        :sha "9e35c979860c75555adaff7600070c60004a0f44"}}
          :main-opts ["-m" "cognitect.test-runner"]
-         :exec-fn cognitect.test-runner.api/test}}}
+         :exec-fn cognitect.test-runner.api/test}
+
+  :build {:deps {io.github.clojure/tools.build {:mvn/version "0.10.5"}
+                 slipset/deps-deploy {:mvn/version "0.2.2"}}
+          :ns-default build}
+
+  :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.09.19"}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test" "deps.edn" "--fail-level" "error"]}}}
