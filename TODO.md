@@ -8,4 +8,3 @@
   - switch to view of trader.
 
 
-  https://github.com/BlockPlayers/OMS
