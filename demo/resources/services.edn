@@ -7,10 +7,11 @@
                    (:timbre/clj (clip/ref :config)))}
 
   ;; trading
-  :db {:start (quanta.blotter.oms.db/trade-db-start 
-               (:path (:db (clip/ref :config)))
-               (:uuid (:db (clip/ref :config))))
-       :stop (quanta.blotter.oms.db/trade-db-stop this)}
+  :db {:start (quanta.util.datahike/db-start
+               {:schema (deref quanta.blotter.oms.db/schema)
+                :db-path (get-in (clip/ref :config) [:db :dir])
+                :uuid (get-in (clip/ref :config) [:db :uuid])})
+       :stop (quanta.util.datahike/db-stop this)}
 
   :sim {:start (antman.sim.state/start!)
         :stop (antman.sim.state/stop!)}

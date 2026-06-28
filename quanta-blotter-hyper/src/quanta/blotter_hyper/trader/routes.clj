@@ -7,6 +7,7 @@
    [token.identity.local]
    [webserver.middleware.ctx :as ctx]
    [quanta.blotter-hyper.auth :as auth]
+   [quanta.blotter-hyper.trader.accounts :refer [accounts-page]]
    [quanta.blotter-hyper.trader.backoffice :refer [backoffice-page]]))
 
 
@@ -25,5 +26,11 @@
                      :title "Backoffice"
                      :get #'backoffice-page
                      :middleware [wrap-ctx
-                                  wrap-identity]}]]))
+                                  wrap-identity]}]
+     ["/accounts" (with-roles #{:trader}
+                    {:name :accounts
+                     :title "Accounts"
+                     :get #'accounts-page
+                     :middleware [wrap-ctx
+                                  wrap-identity]})]]))
 

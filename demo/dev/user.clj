@@ -2,6 +2,7 @@
   (:require
    [clj-reload.core :as reload]
    [demo.routes :refer [rebuild2!]]
+   [modular.system :refer [restart!]]
    ))
 
 #_(reload/init
@@ -10,8 +11,10 @@
 
 (defn reload []
   (reload/reload)
-  (rebuild2!)
-  )
+  (rebuild2!))
+
+(defn restart []
+  (restart!))
 
 
 (comment
