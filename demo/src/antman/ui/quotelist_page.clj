@@ -15,12 +15,12 @@
                r
                )
              )
-    :render (fn [{:keys [quotelist]} req]
+    :render (fn [{:keys [quotelist]} _req]
               [:motion.div.quotelist-page
                (ui/nav)
                [:h1 "Quote list"]
                (ui/quotelist-table @quotelist)])
-    :unmount (fn [{:keys [quotelist dispose!]}]
+    :unmount (fn [{:keys [dispose!]}]
                (println "UNMOUNTING QUOTELIST-PAGE")
                (dispose!))}))
 

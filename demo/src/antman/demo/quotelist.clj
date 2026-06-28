@@ -1,7 +1,7 @@
 (ns antman.demo.quotelist
   (:require
    [missionary.core :as m]
-   [quanta.missionary.logger :refer [create-logger log stop-logger start-log-flow-to-logger]]
+   [quanta.missionary.logger :refer [create-logger log]]
    [quanta.quote.account-manager :refer [create-account-manager add-edn-accounts quote-list-dict-flow]]
    ))
 
@@ -20,7 +20,7 @@
                                  ["EURUSD" "USDJPY" "EURNOK"])
         quotelist (atom {})
         quote-processor   (m/reduce
-                           (fn [s v]
+                           (fn [_ v]
                              ;(println "QUOTELIST: " v)
                              (reset! quotelist v)
                              nil)
@@ -35,8 +35,7 @@
 
 
 (comment
-  @quotelist
+  (def q (create-quotelist))
+  @(:quotelist q)
   am
-  (dispose!)
- ; 
-  )
+  ((:dispose! q)))

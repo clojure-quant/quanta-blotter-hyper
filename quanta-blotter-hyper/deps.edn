@@ -22,4 +22,4 @@
           :ns-default build}
 
   :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.09.19"}}
-         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test" "deps.edn" "--fail-level" "error"]}}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test" "deps.edn" "--fail-level" "error" "--dependencies"]}}}

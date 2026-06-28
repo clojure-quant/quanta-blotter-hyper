@@ -2,7 +2,7 @@
   (:require
    [tick.core :as t]
    [missionary.core :as m]
-   [datahike.api :as d]
+   [datahike.api :refer [q]]
    [hyper.core :as h]))
 
 (def ^:private utc-fmt (t/formatter "yyyy-MM-dd HH:mm:ss.SSS"))
@@ -167,12 +167,12 @@
             [:td.time (fmt-instant-utc (:position/date-close pos))]]))]]]))
 
 (defn query-all-orders [conn]
-  (d/q '[:find [(pull ?e [*]) ...]
+  (q '[:find [(pull ?e [*]) ...]
          :where [?e :order/id _]]
        @conn))
 
 (defn query-account-orders [conn account-id]
-  (d/q '[:find [(pull ?e [*]) ...]
+  (q '[:find [(pull ?e [*]) ...]
          :in $ ?account-id
          :where
          [?e :order/account-id ?account-id]
@@ -180,12 +180,12 @@
        @conn account-id))
 
 (defn query-all-fills [conn]
-  (d/q '[:find [(pull ?e [*]) ...]
+  (q '[:find [(pull ?e [*]) ...]
          :where [?e :fill/id _]]
        @conn))
 
 (defn query-all-positions [conn]
-  (d/q '[:find [(pull ?e [*]) ...]
+  (q '[:find [(pull ?e [*]) ...]
          :where [?e :position/account _]]
        @conn))
 
