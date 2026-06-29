@@ -2,6 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.trades :as trades-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
@@ -66,6 +67,7 @@
                this))
     :render (fn [{:keys [data-a query-a]} _req]
               [:motion.div.backoffice-page
+               (nav/nav)
                (backoffice-header data-a query-a)
                (if-let [data @data-a]
                  (if (:rows data)

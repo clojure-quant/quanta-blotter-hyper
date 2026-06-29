@@ -672,6 +672,11 @@ tr:nth-child(even) {
   font-size: 1.25rem;
 }
 
+.live-trader {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
 .live-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;

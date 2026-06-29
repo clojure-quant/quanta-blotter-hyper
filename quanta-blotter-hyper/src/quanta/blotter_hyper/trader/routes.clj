@@ -8,7 +8,8 @@
    [webserver.middleware.ctx :as ctx]
    [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.trader.accounts :refer [accounts-page]]
-   [quanta.blotter-hyper.trader.backoffice :refer [backoffice-page]]))
+   [quanta.blotter-hyper.trader.backoffice :refer [backoffice-page]]
+   [quanta.blotter-hyper.trader.live :refer [live-page]]))
 
 
 (defn- with-roles
@@ -32,5 +33,11 @@
                      :title "Accounts"
                      :get #'accounts-page
                      :middleware [wrap-ctx
-                                  wrap-identity]})]]))
+                                  wrap-identity]})]
+     ["/trader/live" (with-roles #{:trader}
+                       {:name :trader-live
+                        :title "Live"
+                        :get #'live-page
+                        :middleware [wrap-ctx
+                                     wrap-identity]})]]))
 

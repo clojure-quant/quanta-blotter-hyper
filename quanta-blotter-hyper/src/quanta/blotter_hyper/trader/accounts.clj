@@ -2,6 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter.oms.db :as db]))
 
 (defn- fmt-cell [v]
@@ -107,6 +108,7 @@
                this))
     :render (fn [{:keys [data-a api-a query-a trader db]} _req]
               [:motion.div.accounts-page
+               (nav/nav)
                (accounts-header trader api-a query-a db)
                (if-let [data @data-a]
                  (if (:rows data)
