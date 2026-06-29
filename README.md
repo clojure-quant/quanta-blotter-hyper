@@ -24,8 +24,10 @@ Configuration:
 
 Open:
 
-- http://localhost:3000
+- http://localhost:3000 (Hyper frontend)
+- http://localhost:9000 (Flowy OMS socket server)
 
+The demo also starts a seeded Datahike trade DB, OMS server, and test-order poller (same stack as quanta-blotter/demo `:cli-server`). Delete `demo/trade-db-oms-server` to reset the database.
 
 nREPL listens on port **9100** when the app is running.
 
@@ -54,4 +56,4 @@ clojure -M:test
 | Layout | [Golden Layout](https://golden-layout.github.io/golden-layout/) v2 |
 | Services | [modular](https://github.com/pink-gorilla/modular) |
 
-No database in v1 — simulators write to `positions*` and `trades*` atoms; Hyper watches push HTML updates to the browser.
+Demo `:run` uses a seeded trade DB and OMS for `/backoffice` and `/accounts`. The antman sim pages still use in-memory `positions*` and `trades*` atoms with Hyper watches for live HTML updates.

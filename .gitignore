@@ -10,6 +10,8 @@ target/
 .clj-kondo/.cache
 .clj-kondo/imports
 log/
+demo/trade-db-oms-server
 secrets.edn
 resources/secrets.edn
 .gorilla/
+demo/msg.log

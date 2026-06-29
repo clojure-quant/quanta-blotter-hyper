@@ -12,8 +12,19 @@
  :timbre/clj
  {:min-level [[#{"*"} :info]]
   :appenders {:default {:type :console-color}}}
- 
- :db {:dir "/home/florian/repo/clojure-quant/quanta-blotter/demo/trade-db-oms-server"
+
+ :db {:dir "trade-db-oms-server"
       :uuid #uuid "021097c6-db87-3404-9e84-215f446ef78d"}
- 
- }
+
+ :db-seed {:accounts-file "demo-accounts.edn"}
+
+ :oms-server {:ns-require [fix-engine.blotter.fix-trade]
+              :log-file "log/oms-server-trace.txt"
+              :transaction-log-file "log/oms-server-transaction.txt"
+              :validate? true
+              :tag? true
+              :trading-state-log-file "log/oms-server-trading-state.txt"
+              :trading-state-print-interval-ms 15000}
+
+ :test-order {:account-id 3
+              :interval-sec 30}}

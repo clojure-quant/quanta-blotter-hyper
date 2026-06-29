@@ -1,7 +1,8 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.12.4"}
         io.github.clojure-quant/quanta-blotter-hyper {:local/root "../quanta-blotter-hyper" :deps/manifest :deps}
-        }
+        io.github.clojure-quant/quanta-blotter-cli {:mvn/version "0.1.76"}
+        io.github.clojure-quant/fix-engine {:mvn/version "0.1.58"}}
  :aliases
  {:run {:extra-deps {io.github.tonsky/clj-reload {:mvn/version "1.0.0"}}
         :exec-fn modular.system/start!
