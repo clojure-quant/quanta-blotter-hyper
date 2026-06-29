@@ -1,0 +1,86 @@
+(ns quanta.blotter-hyper.view.orders
+  (:require
+   [datahike.api :refer [q]]
+   [quanta.blotter-hyper.view.common :as common]))
+
+(defn- order-type-cell [order-type]
+  (case order-type
+    :stop [:td.ot "STP"]
+    :limit [:td.ot "LMT"]
+    :market [:td.ot "MKT"]
+    [:td.ot (common/fmt-cell order-type)]))
+
+(defn- wkg-cell [qty-working]
+  [:td {:class (str "wkg" (when (common/pos-num? qty-working) " wkg-active"))}
+   (common/fmt-cell qty-working)])
+
+(defn- status-cell [status]
+  [:td {:class (str "status"
+                    (case status
+                      :filled " status-filled"
+                      :rejected " status-muted"
+                      :cancelled " status-muted"
+                      :working " status-working"
+                      ""))}
+   (common/fmt-cell status)])
+
+(defn orders-table
+  [orders]
+  (let [orders (sort-by :order/date #(compare %2 %1) orders)]
+    [:div.orders-table-wrap
+     [:table.orders-table
+      [:thead
+       [:tr
+        [:th.time "time"]
+        [:th "acct"]
+        [:th "camp"]
+        [:th "lbl"]
+        [:th "id"]
+        [:th "asset"]
+        [:th.side-col "D"]
+        [:th.num "qty"]
+        [:th "OT"]
+        [:th "lmt"]
+        [:th "status"]
+        [:th "wkg"]
+        [:th.num "fill"]
+        [:th.num "avg"]
+        [:th "Message"]]]
+      [:tbody
+       (if (empty? orders)
+         [:tr [:td {:colspan 15} "No orders"]]
+         (for [order orders]
+           [:tr {:key (:order/id order)}
+            [:td.time (common/fmt-instant-utc (:order/date order))]
+            [:td (common/fmt-cell (:order/account-id order))]
+            [:td (common/fmt-cell (:order/campaign order))]
+            [:td (common/fmt-cell (:order/label order))]
+            [:td (common/fmt-cell (:order/id order))]
+            [:td (common/fmt-cell (:order/asset order))]
+            (common/side-cell (:order/side order))
+            [:td.num (common/fmt-cell (:order/qty order))]
+            (order-type-cell (:order/type order))
+            [:td (common/fmt-cell (:order/limit order))]
+            (status-cell (:order/status order))
+            (wkg-cell (:order/qty-working order))
+            [:td.num (common/fmt-pos-num (:order/qty-filled order))]
+            [:td.num (when-let [avg (:order/avg-price order)] (str avg))]
+            [:td (common/fmt-cell (:order/text order))]]))]]]))
+
+(defn query-all-orders [conn]
+  (q '[:find [(pull ?e [*]) ...]
+         :where [?e :order/id _]]
+       @conn))
+
+(defn query-account-orders [conn account-id]
+  (q '[:find [(pull ?e [*]) ...]
+         :in $ ?account-id
+         :where
+         [?e :order/account-id ?account-id]
+         [?e :order/id _]]
+       @conn account-id))
+
+(defn query-orders [conn {:keys [account-id]}]
+  (if account-id
+    (query-account-orders conn account-id)
+    (query-all-orders conn)))

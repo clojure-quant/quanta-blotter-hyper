@@ -659,3 +659,26 @@ tr:nth-child(even) {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.live-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.live-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.live-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.live-column h2 {
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}

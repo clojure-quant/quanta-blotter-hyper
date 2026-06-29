@@ -3,6 +3,7 @@
    [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.token :as token]
    [quanta.blotter-hyper.trader.routes :as trader-routes]
+   [quanta.blotter-hyper.admin.routes :as admin-routes]
    [antman.ui.highcharts-random-page :refer [highcharts-random-page]]
    [antman.ui.layout-page :refer [layout-page]]
    [antman.ui.panels :refer [positions-panel trades-panel]]
@@ -72,6 +73,7 @@
                   (constantly (concat app-routes
                                       (token/routes token)
                                       (trader-routes/routes ctx)
+                                      (admin-routes/routes ctx)
                                       )))
   #'all-routes
   )

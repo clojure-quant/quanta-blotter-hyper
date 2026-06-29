@@ -36,7 +36,9 @@
 
   ;; web
   :ctx {:start {:db (clip/ref :db)
-                :token (clip/ref :token)}}
+                :token (clip/ref :token)
+                :oms-server (clip/ref :oms-server)
+                }}
   :token {:start (quanta.blotter-hyper.auth/start-token-service! (clip/ref :config))}
   :sse-heartbeat {:start (antman.sse.heartbeat/start!)
                   :stop (antman.sse.heartbeat/stop!)}
