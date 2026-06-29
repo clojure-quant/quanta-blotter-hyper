@@ -4,8 +4,7 @@
    [hyper.core :as h]
    [antman.sim.notifications :as notifications]
    [antman.sim.state :as sim]
-   [antman.sse.heartbeat :as heartbeat]
-   [quanta.blotter-hyper.nav :as blotter-nav]))
+   [antman.sse.heartbeat :as heartbeat]))
 
 (defn- fmt-num [n]
   (format "%.2f" (double n)))
@@ -140,16 +139,15 @@
 
 (defn nav
   []
-  (into [:nav.app-nav
-         [:a (h/navigate :trading) "Trading"]
-         " · "
-         [:a (h/navigate :layout) "Layout"]
-         " · "
-         [:a (h/navigate :highcharts-random) "Highcharts random"]
-         " · "
-         [:a (h/navigate :quotelist) "Quote list"]
-         " · "
-         [:a (h/navigate :simulator) "Simulator"]]
-        (concat [" · "]
-                (blotter-nav/blotter-links)
-                [" · " [:a {:href "/me"} "User"]])))
+  [:nav.app-nav
+   [:a (h/navigate :trading) "Trading"]
+   " · "
+   [:a (h/navigate :layout) "Layout"]
+   " · "
+   [:a (h/navigate :highcharts-random) "Highcharts random"]
+   " · "
+   [:a (h/navigate :quotelist) "Quote list"]
+   " · "
+   [:a (h/navigate :simulator) "Simulator"]
+   " · "
+   [:a {:href "/me"} "User"]])

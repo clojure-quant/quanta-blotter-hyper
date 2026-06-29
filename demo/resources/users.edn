@@ -9,7 +9,7 @@
    :email ["viewer@example.com"]},
   :florian
   {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
-   :roles #{:trader},
+   :roles #{:trader :admin},
    :email ["trader@example.com"]},
   :ant
   {:password "5fcdcab954b67c06ca3f8b57358c9b1b",

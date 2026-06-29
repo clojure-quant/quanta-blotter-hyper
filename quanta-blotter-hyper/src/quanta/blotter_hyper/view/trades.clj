@@ -12,6 +12,8 @@
        [:tr
         [:th.time "time"]
         [:th "acct"]
+        [:th "trader"]
+        [:th "acct name"]
         [:th "camp"]
         [:th "lbl"]
         [:th "order-id"]
@@ -22,11 +24,13 @@
         [:th "id"]]]
       [:tbody
        (if (empty? fills)
-         [:tr [:td {:colspan 10} "No trades"]]
+         [:tr [:td {:colspan 12} "No trades"]]
          (for [fill fills]
            [:tr {:key (:fill/id fill)}
             [:td.time (common/fmt-instant-utc (:fill/date fill))]
             [:td (common/fmt-cell (:fill/account-id fill))]
+            [:td (common/fmt-cell (:fill/trader fill))]
+            [:td (common/fmt-cell (:fill/account-name fill))]
             [:td (common/fmt-cell (:fill/campaign fill))]
             [:td (common/fmt-cell (:fill/label fill))]
             [:td (common/fmt-cell (:fill/order-id fill))]
@@ -36,7 +40,14 @@
             [:td.num (when-let [p (:fill/price fill)] (str p))]
             [:td (common/fmt-cell (:fill/id fill))]]))]]]))
 
+(defn- enrich-fill [fill]
+  (common/enrich-account-fields fill
+                                :fill/account-db
+                                :fill/account-name
+                                :fill/trader))
+
 (defn query-all-fills [conn]
-  (q '[:find [(pull ?e [*]) ...]
-         :where [?e :fill/id _]]
-       @conn))
+  (->> (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
+             :where [?e :fill/id _]]
+          @conn)
+       (mapv enrich-fill)))

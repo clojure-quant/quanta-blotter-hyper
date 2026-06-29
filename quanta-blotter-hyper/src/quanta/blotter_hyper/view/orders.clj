@@ -33,6 +33,8 @@
        [:tr
         [:th.time "time"]
         [:th "acct"]
+        [:th "trader"]
+        [:th "acct name"]
         [:th "camp"]
         [:th "lbl"]
         [:th "id"]
@@ -48,11 +50,13 @@
         [:th "Message"]]]
       [:tbody
        (if (empty? orders)
-         [:tr [:td {:colspan 15} "No orders"]]
+         [:tr [:td {:colspan 17} "No orders"]]
          (for [order orders]
            [:tr {:key (:order/id order)}
             [:td.time (common/fmt-instant-utc (:order/date order))]
             [:td (common/fmt-cell (:order/account-id order))]
+            [:td (common/fmt-cell (:order/trader order))]
+            [:td (common/fmt-cell (:order/account-name order))]
             [:td (common/fmt-cell (:order/campaign order))]
             [:td (common/fmt-cell (:order/label order))]
             [:td (common/fmt-cell (:order/id order))]
@@ -67,18 +71,26 @@
             [:td.num (when-let [avg (:order/avg-price order)] (str avg))]
             [:td (common/fmt-cell (:order/text order))]]))]]]))
 
+(defn- enrich-order [order]
+  (common/enrich-account-fields order
+                                :order/account-db
+                                :order/account-name
+                                :order/trader))
+
 (defn query-all-orders [conn]
-  (q '[:find [(pull ?e [*]) ...]
-         :where [?e :order/id _]]
-       @conn))
+  (->> (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
+             :where [?e :order/id _]]
+          @conn)
+       (mapv enrich-order)))
 
 (defn query-account-orders [conn account-id]
-  (q '[:find [(pull ?e [*]) ...]
-         :in $ ?account-id
-         :where
-         [?e :order/account-id ?account-id]
-         [?e :order/id _]]
-       @conn account-id))
+  (->> (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
+             :in $ ?account-id
+             :where
+             [?e :order/account-id ?account-id]
+             [?e :order/id _]]
+          @conn account-id)
+       (mapv enrich-order)))
 
 (defn query-orders [conn {:keys [account-id]}]
   (if account-id

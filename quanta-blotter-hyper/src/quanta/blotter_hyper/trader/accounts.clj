@@ -3,44 +3,8 @@
    [missionary.core :as m]
    [hyper.core :as h]
    [quanta.blotter-hyper.nav :as nav]
+   [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter.oms.db :as db]))
-
-(defn- fmt-cell [v]
-  (cond
-    (nil? v) "—"
-    (boolean? v) (str v)
-    (keyword? v) (name v)
-    :else (str v)))
-
-(defn- fmt-settings [settings]
-  (if (some? settings)
-    (pr-str settings)
-    "—"))
-
-(defn accounts-table
-  [accounts]
-  (let [accounts (sort-by :account/id accounts)]
-    [:div.orders-table-wrap
-     [:table.orders-table
-      [:thead
-       [:tr
-        [:th "account id"]
-        [:th "account name"]
-        [:th.num "account balance"]
-        [:th "enabled"]
-        [:th "api type"]
-        [:th "settings"]]]
-      [:tbody
-       (if (empty? accounts)
-         [:tr [:td {:colspan 6} "No accounts"]]
-         (for [account accounts]
-           [:tr {:key (:account/id account)}
-            [:td (fmt-cell (:account/id account))]
-            [:td (fmt-cell (:account/name account))]
-            [:td.num (fmt-cell (:account/balance account))]
-            [:td (fmt-cell (:account/enabled account))]
-            [:td (fmt-cell (:account/api account))]
-            [:td.settings (fmt-settings (:account/settings account))]]))]]]))
 
 (def ^:private query-options {})
 
@@ -49,13 +13,8 @@
    [:bybit-trade "bybit-trade"]
    [:paper "paper"]])
 
-(defn- query-trader-accounts [db-conn trader]
-  (db/trader-account-list db-conn trader))
-
-(defn process-query [db-conn {:keys [trader]}]
-  (if trader
-    (query-trader-accounts db-conn trader)
-    []))
+(defn process-query [db-conn query]
+  (accounts-view/query-accounts db-conn query))
 
 (defn process-query-f [db-conn query-f data-a]
   (m/ap
@@ -70,10 +29,9 @@
     (t #(println "accounts query processor done" %)
        #(println "accounts query processor error" %))))
 
-(defn- accounts-header [trader api-a query-a db-conn]
+(defn- accounts-header [api-a query-a db-conn trader]
   [:header.accounts-header
    [:h1 "Accounts"]
-   [:span.accounts-trader (str "Trader: " trader)]
    [:select {:data-on:change
              (h/action (reset! api-a (keyword $value)))}
     (for [[kw label] api-options]
@@ -108,11 +66,11 @@
                this))
     :render (fn [{:keys [data-a api-a query-a trader db]} _req]
               [:motion.div.accounts-page
-               (nav/nav)
-               (accounts-header trader api-a query-a db)
+               (nav/trader-nav)
+               (accounts-header api-a query-a db trader)
                (if-let [data @data-a]
                  (if (:rows data)
-                   (accounts-table (:rows data))
+                   (accounts-view/accounts-table (:rows data))
                    [:p "Loading…"])
                  [:p "Loading…"])])
     :unmount (fn [{:keys [dispose!]}]

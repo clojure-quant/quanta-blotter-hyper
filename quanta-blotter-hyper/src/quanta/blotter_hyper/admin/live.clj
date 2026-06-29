@@ -16,7 +16,7 @@
     :render (fn [{:keys [trading-state-trader]} _req]
               (let [{:keys [open-positions working-orders]} @trading-state-trader]
                 [:motion.div.live-page
-                 (nav/nav)
+                 (nav/admin-nav)
                  [:header.live-header
                   [:h1 "Live"]]
                  [:div.live-columns

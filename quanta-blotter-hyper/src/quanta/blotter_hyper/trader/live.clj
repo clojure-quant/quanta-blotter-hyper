@@ -3,6 +3,7 @@
    [missionary.core :as m]
    [hyper.core :as h]
    [quanta.blotter-hyper.nav :as nav]
+   [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
 
@@ -32,30 +33,47 @@
   [{:keys [ctx] :as _req}]
   (h/view
    {:mount (fn []
-             (let [ts (get-in ctx [:oms-server :trading-state-trader])
+             (let [db (:db ctx)
+                   oms (get-in ctx [:oms-server :oms])
+                   _ (assert db ":db needs to be in :ctx")
+                   _ (assert oms ":oms-server :oms needs to be in :ctx")
+                   ts (get-in ctx [:oms-server :trading-state-trader])
                    _ (assert ts ":oms-server :trading-state-trader needs to be in :ctx")
                    identity @(h/session-cursor :identity)
                    trader (name (:user identity))
+                   accounts (send-order/trader-accounts db trader)
+                   first-account (ffirst accounts)
                    data-a (atom nil)
+                   order-state-a (atom (send-order/default-state first-account))
                    this {:data-a data-a
+                         :order-state-a order-state-a
+                         :accounts accounts
+                         :assets (send-order/available-assets)
+                         :oms oms
                          :trader trader
                          :dispose! (start-trader-live-processor trader ts data-a)}]
                (h/watch! data-a)
+               (h/watch! order-state-a)
                this))
-    :render (fn [{:keys [data-a trader]} _req]
+    :render (fn [{:keys [data-a order-state-a accounts assets oms trader]} _req]
               (let [{:keys [open-positions working-orders]}
                     (or @data-a {:open-positions [] :working-orders []})]
                 [:motion.div.live-page
-                 (nav/nav)
-                 [:header.live-header
-                  [:h1 "Live"]
-                  [:span.live-trader (str "Trader: " trader)]]
-                 [:div.live-columns
-                  [:section.live-column
-                   [:h2 "Open positions"]
-                   (positions-view/positions-table open-positions)]
-                  [:section.live-column
-                   [:h2 "Working orders"]
-                   (orders-view/orders-table working-orders)]]]))
+                 (nav/trader-nav)
+                 [:div.live-layout
+                  [:div.live-main
+                   [:header.live-header
+                    [:h1 "Live"]]
+                   [:div.live-columns
+                    [:section.live-column
+                     [:h2 "Open positions"]
+                     (positions-view/positions-table open-positions)]
+                    [:section.live-column
+                     [:h2 "Working orders"]
+                     (orders-view/orders-table working-orders)]]]
+                  (send-order/panel {:state-a order-state-a
+                                     :accounts accounts
+                                     :assets assets
+                                     :oms oms})]]))
     :unmount (fn [{:keys [dispose!]}]
                (dispose!))}))

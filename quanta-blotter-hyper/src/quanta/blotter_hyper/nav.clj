@@ -2,16 +2,27 @@
   (:require
    [hyper.core :as h]))
 
-(defn blotter-links
-  []
-  [[:a (h/navigate :backoffice) "Backoffice"]
-   " · "
-   [:a (h/navigate :accounts) "Accounts"]
-   " · "
-   [:a (h/navigate :trader-live) "Live"]
-   " · "
-   [:a (h/navigate :admin-live) "Admin live"]])
+(defn- current-user-name []
+  (some-> @(h/session-cursor :identity) :user name))
 
-(defn nav
+(defn trader-nav
   []
-  (into [:nav.app-nav] (blotter-links)))
+  [:nav.app-nav.blotter-nav
+   [:span.blotter-nav-label (str "Trader: " (current-user-name))]
+   [:div.blotter-nav-links
+    [:a (h/navigate :trader-live) "Live"]
+    " · "
+    [:a (h/navigate :backoffice) "Backoffice"]
+    " · "
+    [:a (h/navigate :accounts) "Accounts"]]])
+
+(defn admin-nav
+  []
+  [:nav.app-nav.blotter-nav
+   [:span.blotter-nav-label (str "Admin: " (current-user-name))]
+   [:div.blotter-nav-links
+    [:a (h/navigate :admin-live) "Live"]
+    " · "
+    [:a (h/navigate :admin-backoffice) "Backoffice"]
+    " · "
+    [:a (h/navigate :admin-accounts) "Accounts"]]])

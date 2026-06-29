@@ -51,8 +51,8 @@
     :positions (positions-view/positions-table rows)
     [:p "Unknown table"]))
 
-(defn backoffice-page
-  [{:keys [ctx] :as _req}]
+(defn backoffice-page*
+  [nav-fn {:keys [ctx] :as _req}]
   (h/view
    {:mount (fn []
              (let [db (:db ctx)
@@ -67,7 +67,7 @@
                this))
     :render (fn [{:keys [data-a query-a]} _req]
               [:motion.div.backoffice-page
-               (nav/nav)
+               (nav-fn)
                (backoffice-header data-a query-a)
                (if-let [data @data-a]
                  (if (:rows data)
@@ -76,3 +76,8 @@
                  [:p "Loading…"])])
     :unmount (fn [{:keys [dispose!]}]
                (dispose!))}))
+
+(defn backoffice-page
+  ([req] (backoffice-page nav/trader-nav req))
+  ([nav-fn req]
+   (backoffice-page* nav-fn req)))

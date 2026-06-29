@@ -7,6 +7,9 @@
    [token.identity.local]
    [webserver.middleware.ctx :as ctx]
    [quanta.blotter-hyper.auth :as auth]
+   [quanta.blotter-hyper.admin.accounts :refer [accounts-page]]
+   [quanta.blotter-hyper.admin.backoffice :refer [backoffice-page]]
+   [quanta.blotter-hyper.admin.home :refer [home-page]]
    [quanta.blotter-hyper.admin.live :refer [live-page]]))
 
 (defn- with-roles
@@ -19,9 +22,27 @@
                    (ctx/wrap-ctx handler ctx))
         wrap-identity (fn [handler]
                         (token.identity.local/wrap-identity handler (:token ctx)))]
-    [["/admin/live" (with-roles #{:admin :trader}
+    [["/admin" (with-roles #{:admin :trader}
+                {:name :admin-home
+                 :title "Admin"
+                 :get #'home-page
+                 :middleware [wrap-ctx
+                              wrap-identity]})]
+     ["/admin/live" (with-roles #{:admin :trader}
                       {:name :admin-live
                        :title "Live"
                        :get #'live-page
                        :middleware [wrap-ctx
-                                    wrap-identity]})]]))
+                                    wrap-identity]})]
+     ["/admin/backoffice" (with-roles #{:admin :trader}
+                            {:name :admin-backoffice
+                             :title "Backoffice"
+                             :get #'backoffice-page
+                             :middleware [wrap-ctx
+                                          wrap-identity]})]
+     ["/admin/accounts" (with-roles #{:admin :trader}
+                          {:name :admin-accounts
+                           :title "Accounts"
+                           :get #'accounts-page
+                           :middleware [wrap-ctx
+                                        wrap-identity]})]]))

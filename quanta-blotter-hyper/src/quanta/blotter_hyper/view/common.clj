@@ -25,3 +25,13 @@
     :buy [:td.side.profit "B"]
     :sell [:td.side.loss "S"]
     [:td.side (fmt-cell side)]))
+
+(defn enrich-account-fields
+  "Join account fields pulled via *-db ref into flat entity keys."
+  [entity account-db-key account-name-key trader-key]
+  (if-let [account (get entity account-db-key)]
+    (-> entity
+        (assoc account-name-key (:account/name account)
+               trader-key (:account/trader account))
+        (dissoc account-db-key))
+    entity))
