@@ -1,6 +1,7 @@
 (ns quanta.blotter-hyper.view.orders
   (:require
    [datahike.api :refer [q]]
+   [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
 
 (defn- order-type-cell [order-type]
@@ -77,11 +78,18 @@
                                 :order/account-name
                                 :order/trader))
 
-(defn query-all-orders [conn]
+(defn query-orders-by-account-pred [conn account-id-pred]
   (->> (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
-             :where [?e :order/id _]]
-          @conn)
+             :in $ ?account-id-pred
+             :where
+             [?e :order/account-id ?account-id]
+             [(?account-id-pred ?account-id)]
+             [?e :order/id _]]
+          @conn account-id-pred)
        (mapv enrich-order)))
+
+(defn query-all-orders [conn]
+  (query-orders-by-account-pred conn (constantly true)))
 
 (defn query-account-orders [conn account-id]
   (->> (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
@@ -92,7 +100,8 @@
           @conn account-id)
        (mapv enrich-order)))
 
-(defn query-orders [conn {:keys [account-id]}]
-  (if account-id
-    (query-account-orders conn account-id)
-    (query-all-orders conn)))
+(defn query-orders [conn {:keys [account-id trader] :as opts}]
+  (cond
+    account-id (query-account-orders conn account-id)
+    (contains? opts :trader) (query-orders-by-account-pred conn (accounts-view/account-id-pred conn trader))
+    :else (query-all-orders conn)))

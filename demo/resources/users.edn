@@ -7,6 +7,12 @@
   {:password "2cf93d67884e1e50e65bfa71671c55ec",
    :roles #{:viewer},
    :email ["viewer@example.com"]},
+  ;; trader to do permanent __TEST orders.
+  :testtrader
+  {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
+   :roles #{:trader},
+   :email ["trader@example.com"]},
+  ;; real traders here
   :florian
   {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
    :roles #{:trader :admin},

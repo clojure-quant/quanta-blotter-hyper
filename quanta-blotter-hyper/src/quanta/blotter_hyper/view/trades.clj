@@ -1,6 +1,7 @@
 (ns quanta.blotter-hyper.view.trades
   (:require
    [datahike.api :refer [q]]
+   [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
 
 (defn fill-table
@@ -46,8 +47,18 @@
                                 :fill/account-name
                                 :fill/trader))
 
-(defn query-all-fills [conn]
+(defn query-fills-by-account-pred [conn account-id-pred]
   (->> (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
-             :where [?e :fill/id _]]
-          @conn)
+             :in $ ?account-id-pred
+             :where
+             [?e :fill/account-id ?account-id]
+             [(?account-id-pred ?account-id)]
+             [?e :fill/id _]]
+          @conn account-id-pred)
        (mapv enrich-fill)))
+
+(defn query-all-fills [conn]
+  (query-fills-by-account-pred conn (constantly true)))
+
+(defn query-fills [conn {:keys [trader]}]
+  (query-fills-by-account-pred conn (accounts-view/account-id-pred conn trader)))

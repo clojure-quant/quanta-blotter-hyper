@@ -1,6 +1,7 @@
 (ns quanta.blotter-hyper.view.positions
   (:require
    [datahike.api :refer [q]]
+   [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
 
 (defn- fmt-open? [open?]
@@ -53,8 +54,17 @@
                                 :position/account-name
                                 :position/trader))
 
-(defn query-all-positions [conn]
+(defn query-positions-by-account-pred [conn account-id-pred]
   (->> (q '[:find [(pull ?e [* {:position/account-db [:account/name :account/trader]}]) ...]
-             :where [?e :position/account _]]
-          @conn)
+             :in $ ?account-id-pred
+             :where
+             [?e :position/account ?account-id]
+             [(?account-id-pred ?account-id)]]
+          @conn account-id-pred)
        (mapv enrich-position)))
+
+(defn query-all-positions [conn]
+  (query-positions-by-account-pred conn (constantly true)))
+
+(defn query-positions [conn {:keys [trader]}]
+  (query-positions-by-account-pred conn (accounts-view/account-id-pred conn trader)))

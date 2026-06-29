@@ -55,3 +55,20 @@
   (if trader
     (query-trader-accounts conn trader)
     (query-all-accounts conn)))
+
+(defn trader-account-id-set
+  "When trader is a name, query accounts and return a set of :account/id.
+   When trader is nil, return an empty set."
+  [conn trader]
+  (if trader
+    (into #{} (map :account/id) (query-trader-accounts conn trader))
+    #{}))
+
+(defn account-id-pred
+  "Datalog predicate for backoffice filtering by trader accounts.
+   Admin (trader nil) matches all account ids; otherwise uses set membership."
+  [conn trader]
+  (let [account-ids (trader-account-id-set conn trader)]
+    (if trader
+      (partial contains? account-ids)
+      (constantly true))))

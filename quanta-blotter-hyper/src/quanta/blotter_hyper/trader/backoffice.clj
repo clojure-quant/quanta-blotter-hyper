@@ -7,11 +7,11 @@
    [quanta.blotter-hyper.view.trades :as trades-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
 
-(defn- process-query [db-conn {:keys [table account-id]}]
+(defn- process-query [db-conn {:keys [table trader]}]
   (case table
-    :orders (orders-view/query-orders db-conn {:account-id account-id})
-    :trades (trades-view/query-all-fills db-conn)
-    :positions (positions-view/query-all-positions db-conn)
+    :orders (orders-view/query-orders db-conn {:trader trader})
+    :trades (trades-view/query-fills db-conn {:trader trader})
+    :positions (positions-view/query-positions db-conn {:trader trader})
     []))
 
 (defn- process-query-f [db-conn query-f data-a]
@@ -52,13 +52,13 @@
     [:p "Unknown table"]))
 
 (defn backoffice-page*
-  [nav-fn {:keys [ctx] :as _req}]
+  [nav-fn {:keys [ctx] :as _req} query-options]
   (h/view
    {:mount (fn []
              (let [db (:db ctx)
                    _ (assert db ":db needs to be in :ctx")
                    data-a (atom nil)
-                   query-a (atom {:table :orders})
+                   query-a (atom (merge {:table :orders} query-options))
                    query-f (m/watch query-a)
                    this {:data-a data-a
                          :query-a query-a
@@ -78,6 +78,9 @@
                (dispose!))}))
 
 (defn backoffice-page
-  ([req] (backoffice-page nav/trader-nav req))
-  ([nav-fn req]
-   (backoffice-page* nav-fn req)))
+  ([req]
+   (let [identity @(h/session-cursor :identity)
+         trader (name (:user identity))]
+     (backoffice-page* nav/trader-nav req {:trader trader})))
+  ([nav-fn req query-options]
+   (backoffice-page* nav-fn req query-options)))
