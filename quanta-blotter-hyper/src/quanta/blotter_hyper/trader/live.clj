@@ -46,8 +46,10 @@
                    first-account (ffirst accounts)
                    data-a (atom nil)
                    order-state-a (atom (send-order/default-state first-account))
+                   order-error-a (atom nil)
                    this {:data-a data-a
                          :order-state-a order-state-a
+                         :order-error-a order-error-a
                          :accounts accounts
                          :assets (send-order/available-assets)
                          :oms oms
@@ -55,8 +57,9 @@
                          :dispose! (start-trader-live-processor trader ts data-a)}]
                (h/watch! data-a)
                (h/watch! order-state-a)
+               (h/watch! order-error-a)
                this))
-    :render (fn [{:keys [data-a order-state-a accounts assets oms trader]} _req]
+    :render (fn [{:keys [data-a order-state-a order-error-a accounts assets oms trader]} _req]
               (let [{:keys [open-positions working-orders]}
                     (or @data-a {:open-positions [] :working-orders []})]
                 [:motion.div.live-page
@@ -73,6 +76,7 @@
                      [:h2 "Working orders"]
                      (orders-view/orders-table working-orders)]]]
                   (send-order/panel {:state-a order-state-a
+                                     :error-a order-error-a
                                      :accounts accounts
                                      :assets assets
                                      :oms oms})]]))

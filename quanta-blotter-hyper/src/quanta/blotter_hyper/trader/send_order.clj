@@ -54,10 +54,17 @@
     (#{:limit :stop} (:order-type state))
     (assoc :limit (:limit state))))
 
+(defn state->trader-message
+  [state]
+  (assoc (state->order-details state) :type :trader/new-order))
+
+(defn validation-error
+  [state]
+  (schema/human-error-trader-message (state->trader-message state)))
+
 (defn valid-new-order?
   [state]
-  (schema/validate-trader-message
-   (assoc (state->order-details state) :type :trader/new-order)))
+  (schema/validate-trader-message (state->trader-message state)))
 
 (defn reset-order-id!
   [state-a]
@@ -65,22 +72,38 @@
 
 (defn submit!
   "Submit a new order to the order manager and reset `:order-id`."
-  [oms state-a]
+  [oms state-a error-a]
   (let [state @state-a
         details (state->order-details state)]
-    (when (valid-new-order? state)
-      (m/? (oms/create-order oms details))
-      (reset-order-id! state-a))))
+    (if (valid-new-order? state)
+      (do
+        (reset! error-a nil)
+        (m/? (oms/create-order oms details))
+        (reset-order-id! state-a))
+      (reset! error-a (validation-error state)))))
+
+(defn- keyword-from-select
+  "Parse select value to a simple keyword. Avoids `(keyword \":buy\")` -> `::buy`."
+  [v]
+  (keyword (if (keyword? v)
+             (name v)
+             (let [s (str v)]
+               (if (and (seq s) (= \: (first s)))
+                 (subs s 1)
+                 s)))))
+
+(defn- select-value-str [v]
+  (if (keyword? v) (name v) (str v)))
 
 (defn- select-field
   [label value options on-change]
   [:label.send-order-field
    [:span.send-order-label label]
-   [:select {:value (str value)
+   [:select {:value (select-value-str value)
              :data-on:change (h/action (on-change $value))}
     (for [[opt-val opt-label] options]
-      [:option {:key (str opt-val)
-                :value (str opt-val)
+      [:option {:key (select-value-str opt-val)
+                :value (select-value-str opt-val)
                 :selected (= opt-val value)}
        opt-label])]])
 
@@ -109,12 +132,15 @@
     [id (str id " " name)]))
 
 (defn panel
-  "Reusable send-order panel. Expects `state-a` atom, `accounts` map from
-  `trader-accounts`, `assets` from `available-assets`, and `oms`."
-  [{:keys [state-a accounts assets oms]}]
+  "Reusable send-order panel. Expects `state-a` atom, `error-a` atom, `accounts`
+  map from `trader-accounts`, `assets` from `available-assets`, and `oms`."
+  [{:keys [state-a error-a accounts assets oms]}]
   (let [state @state-a
+        order-data (state->order-details state)
+        validation-error @error-a
         update-field (fn [k parse]
                        (fn [v]
+                         (reset! error-a nil)
                          (swap! state-a assoc k (parse v))))
         show-limit? (#{:limit :stop} (:order-type state))]
     [:section.send-order-panel
@@ -129,10 +155,10 @@
                     (update-field :asset identity))
       (select-field "side" (:side state)
                     [[:buy "buy"] [:sell "sell"]]
-                    (update-field :side keyword))
+                    (update-field :side keyword-from-select))
       (select-field "order-type" (:order-type state)
                     [[:limit "limit"] [:market "market"] [:stop "stop"]]
-                    (update-field :order-type keyword))
+                    (update-field :order-type keyword-from-select))
       (when show-limit?
         (num-field "limit" (:limit state)
                    (update-field :limit bigdec)))
@@ -142,5 +168,10 @@
       (text-field "label" (:label state) identity {:readonly true})
       [:button.send-order-submit
        {:type "button"
-        :data-on:click (h/action (submit! oms state-a))}
-       "Send order"]]]))
+        :data-on:click (h/action (submit! oms state-a error-a))}
+       "Send order"]]
+     (when validation-error
+       [:div.send-order-error
+        [:p "cannot send order, schema validation error"]
+        [:pre (pr-str validation-error)]])
+     [:pre.send-order-preview (pr-str order-data)]]))

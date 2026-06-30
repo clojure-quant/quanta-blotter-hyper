@@ -798,3 +798,41 @@ tr:nth-child(even) {
 .send-order-submit:hover {
   background: #1e6f31;
 }
+
+.send-order-preview {
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+  color: #ccc;
+  background: #0f0f1a;
+  border: 1px solid #333;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+  max-height: 4rem;
+}
+
+.send-order-error {
+  margin: 0.5rem 0 0;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.8rem;
+  color: #ffb4b4;
+  background: #2a1215;
+  border: 1px solid #7a2e2e;
+  border-radius: 3px;
+}
+
+.send-order-error p {
+  margin: 0 0 0.35rem;
+}
+
+.send-order-error pre {
+  margin: 0;
+  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #ffd0d0;
+}

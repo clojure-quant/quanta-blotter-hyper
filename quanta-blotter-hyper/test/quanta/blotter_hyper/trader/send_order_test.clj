@@ -54,4 +54,10 @@
       (is (not (contains? (send-order/state->order-details state) :limit)))))
 
   (testing "default state is a valid new-order"
-    (is (send-order/valid-new-order? (send-order/default-state 1)))))
+    (is (send-order/valid-new-order? (send-order/default-state 1))))
+
+  (testing "invalid state returns validation error map"
+    (let [state (assoc (send-order/default-state 1) :qty -1M)]
+      (is (false? (send-order/valid-new-order? state)))
+      (is (map? (send-order/validation-error state)))
+      (is (contains? (send-order/validation-error state) :qty)))))
