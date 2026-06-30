@@ -159,9 +159,10 @@
       (select-field "order-type" (:order-type state)
                     [[:limit "limit"] [:market "market"] [:stop "stop"]]
                     (update-field :order-type keyword-from-select))
-      (when show-limit?
-        (num-field "limit" (:limit state)
-                   (update-field :limit bigdec)))
+      [:div#send-order-limit-slot
+       (when show-limit?
+         (num-field "limit" (:limit state)
+                    (update-field :limit bigdec)))]
       (num-field "qty" (:qty state)
                  (update-field :qty bigdec))
       (text-field "campaign" (:campaign state) identity {:readonly true})
