@@ -30,14 +30,15 @@
        #(println "trader live processor error" %))))
 
 (defn live-page
-  [{:keys [ctx] :as _req}]
+  [{:keys [hyper/env] :as _req}]
   (h/view
    {:mount (fn []
-             (let [db (:db ctx)
-                   oms (get-in ctx [:oms-server :oms])
+             (let [db (:db env)
+                   oms (get-in env [:oms-server :oms])
+                   _ (println "*** live-page ctx: " (keys env))
                    _ (assert db ":db needs to be in :ctx")
                    _ (assert oms ":oms-server :oms needs to be in :ctx")
-                   ts (get-in ctx [:oms-server :trading-state-trader])
+                   ts (get-in env [:oms-server :trading-state-trader])
                    _ (assert ts ":oms-server :trading-state-trader needs to be in :ctx")
                    identity @(h/session-cursor :identity)
                    trader (name (:user identity))

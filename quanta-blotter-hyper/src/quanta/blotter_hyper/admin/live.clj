@@ -6,10 +6,10 @@
    [quanta.blotter-hyper.view.positions :as positions-view]))
 
 (defn live-page
-  [{:keys [ctx] :as _req}]
+  [{:keys [hyper/env] :as _req}]
   (h/view
    {:mount (fn []
-             (let [ts (get-in ctx [:oms-server :trading-state-trader])
+             (let [ts (get-in env [:oms-server :trading-state-trader])
                    _ (assert ts ":oms-server :trading-state-trader needs to be in :ctx")]
                (h/watch! ts)
                {:trading-state-trader ts}))

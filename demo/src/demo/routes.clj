@@ -9,8 +9,7 @@
    [antman.ui.panels :refer [positions-panel trades-panel]]
    [antman.ui.quotelist-page :refer [quotelist-page]]
    [antman.ui.simulator-page :refer [simulator-page]]
-   [antman.ui.trading :refer [trading-page]]
-   ))
+   [antman.ui.trading :refer [trading-page]]))
 
 (defn- with-roles
   [required-roles route-data]
@@ -24,62 +23,46 @@
                 (if (auth/signed-in? req)
                   {:status 302 :headers {"Location" "/trading"} :body ""}
                   {:status 302 :headers {"Location" "/login"} :body ""}))}]
-   ["/trading"
+   ["/trading1"
     (with-roles #{:trader}
-     {:name :trading
-      :title "Trading"
-      :get #'trading-page})]
+      {:name :trader1
+       :title "Trading"
+       :get #'trading-page})]
    ["/layout"
     (with-roles #{:trader}
-     {:name :layout
-      :title "Layout"
-      :get #'layout-page})]
+      {:name :layout
+       :title "Layout"
+       :get #'layout-page})]
    ["/highcharts-random"
     (with-roles #{:trader}
-     {:name :highcharts-random
-      :title "Highcharts random"
-      :get #'highcharts-random-page})]
+      {:name :highcharts-random
+       :title "Highcharts random"
+       :get #'highcharts-random-page})]
    ["/panels/positions"
     (with-roles #{:trader}
-     {:name :panel-positions
-      :title "Positions"
-      :get #'positions-panel})]
+      {:name :panel-positions
+       :title "Positions"
+       :get #'positions-panel})]
    ["/panels/trades"
     (with-roles #{:trader}
-     {:name :panel-trades
-      :title "Trades"
-      :get #'trades-panel})]
+      {:name :panel-trades
+       :title "Trades"
+       :get #'trades-panel})]
    ["/quotelist"
     (with-roles #{:viewer :trader}
-     {:name :quotelist
-      :title "Quote list"
-      :get #'quotelist-page})]
+      {:name :quotelist
+       :title "Quote list"
+       :get #'quotelist-page})]
    ["/simulator"
     (with-roles #{:admin}
-     {:name :simulator
-      :title "Signal simulator"
-      :get #'simulator-page})]])
+      {:name :simulator
+       :title "Signal simulator"
+       :get #'simulator-page})]])
 
-(defonce all-routes
-  (into (vec app-routes) (token/routes nil)))
 
-(defonce last-ctx (atom nil))
+(defn routes [{:keys [token] :as ctx}]
+  (concat app-routes
+          (token/routes token)
+          (trader-routes/routes ctx)
+          (admin-routes/routes ctx)))
 
-(defn rebuild!
-  [{:keys [token] :as ctx}]
-  (reset! last-ctx ctx)
-  (println "rebuilding routes..")
-  (alter-var-root #'all-routes
-                  (constantly (concat app-routes
-                                      (token/routes token)
-                                      (trader-routes/routes ctx)
-                                      (admin-routes/routes ctx)
-                                      )))
-  #'all-routes
-  )
-
-(defn rebuild2! []
-  (if @last-ctx 
-    (rebuild! @last-ctx)
-    (println "no last ctx, skipping rebuild")
-    ))

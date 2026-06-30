@@ -3,16 +3,15 @@
    [hyper.core :as h]
    [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.handler :refer [head-tags]]
-   [demo.routes :as routes]
    [antman.sim.state :as sim]
    [antman.sse.heartbeat :as heartbeat]
    ))
 
 (defn create-handler
   "Ring handler for Hyper. Optional clip refs establish service start order."
-  []
+  [routes]
   (h/create-handler
-   #'routes/all-routes
+   routes
    :static-resources "public"
    :head #'head-tags
    :middleware [auth/wrap-hydrate-identity]

@@ -52,10 +52,10 @@
     [:p "Unknown table"]))
 
 (defn backoffice-page*
-  [nav-fn {:keys [ctx] :as _req} query-options]
+  [nav-fn {:keys [hyper/env] :as _req} query-options]
   (h/view
    {:mount (fn []
-             (let [db (:db ctx)
+             (let [db (:db env)
                    _ (assert db ":db needs to be in :ctx")
                    data-a (atom nil)
                    query-a (atom (merge {:table :orders} query-options))

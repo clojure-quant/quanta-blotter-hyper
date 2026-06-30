@@ -45,10 +45,10 @@
     "Add account"]])
 
 (defn accounts-page
-  [{:keys [ctx] :as _req}]
+  [{:keys [hyper/env] :as _req}]
   (h/view
    {:mount (fn []
-             (let [db (:db ctx)
+             (let [db (:db env)
                    _ (assert db ":db needs to be in :ctx")
                    identity @(h/session-cursor :identity)
                    trader (name (:user identity))
