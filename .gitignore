@@ -16,3 +16,4 @@ resources/secrets.edn
 .gorilla/
 demo/msg.log
 demo/.flowy
+quanta-blotter-hyper/.clj-kondo

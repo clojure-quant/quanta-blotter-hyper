@@ -10,7 +10,7 @@
 
 (defn quote-printer [mode subscription-a f]
   (m/reduce
-   (fn [s v]
+   (fn [_ v]
      (when (map? v)
        (print "\u001b[2J\u001b[H")
        (println "mode: " mode " subscription: " @subscription-a)

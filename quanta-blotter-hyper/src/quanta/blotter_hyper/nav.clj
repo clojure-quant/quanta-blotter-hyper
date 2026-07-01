@@ -26,5 +26,7 @@
     " · "
     [:a (h/navigate :admin/backoffice) "Backoffice"]
     " · "
-    [:a (h/navigate :admin/accounts) "Accounts"]]
+    [:a (h/navigate :admin/accounts) "Accounts"]
+    " · "
+    [:a (h/navigate :admin/assets) "Assets"]]
    [:span.blotter-nav-label (str "Admin: " (current-user-name))]])

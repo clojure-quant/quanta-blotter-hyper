@@ -59,7 +59,7 @@
                (h/watch! order-state-a)
                (h/watch! order-error-a)
                this))
-    :render (fn [{:keys [data-a order-state-a order-error-a accounts assets oms trader]} _req]
+    :render (fn [{:keys [data-a order-state-a order-error-a accounts assets oms]} _req]
               (let [{:keys [open-positions working-orders]}
                     (or @data-a {:open-positions [] :working-orders []})]
                 [:motion.div.live-page

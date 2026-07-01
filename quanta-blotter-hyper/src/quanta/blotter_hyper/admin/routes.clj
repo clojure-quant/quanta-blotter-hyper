@@ -5,10 +5,10 @@
    [ring.middleware.keyword-params]
    [ring.middleware.params]
    [token.identity.local]
-   [webserver.middleware.ctx :as ctx]
    [quanta.blotter-hyper.middleware :as middleware]
    [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.admin.accounts :refer [accounts-page]]
+   [quanta.blotter-hyper.admin.assets :refer [assets-page]]
    [quanta.blotter-hyper.admin.backoffice :refer [backoffice-page]]
    [quanta.blotter-hyper.admin.home :refer [home-page]]
    [quanta.blotter-hyper.admin.live :refer [live-page]]))
@@ -46,4 +46,10 @@
                            :title "Accounts"
                            :get #'accounts-page
                            :middleware [wrap-ctx
-                                        wrap-identity]})]]))
+                                        wrap-identity]})]
+     ["/admin/assets" (with-roles #{:admin}
+                        {:name :admin/assets
+                         :title "Assets"
+                         :get #'assets-page
+                         :middleware [wrap-ctx
+                                      wrap-identity]})]]))

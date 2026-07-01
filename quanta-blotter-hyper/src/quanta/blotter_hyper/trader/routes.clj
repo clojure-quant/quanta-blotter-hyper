@@ -5,7 +5,6 @@
    [ring.middleware.keyword-params]
    [ring.middleware.params]
    [token.identity.local]
-   [webserver.middleware.ctx :as ctx]
     [quanta.blotter-hyper.middleware :as middleware]
    [quanta.blotter-hyper.auth :as auth]
    [quanta.blotter-hyper.trader.accounts :refer [accounts-page]]

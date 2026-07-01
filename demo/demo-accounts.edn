@@ -97,4 +97,14 @@
                            :port 5212
                            :ssl true}
                      :login {:username "5292473"
-                             :password "Regenschirm13!"}}}]
+                             :password "Regenschirm13!"}}}
+                             
+ {:account/id 2000
+  :account/trader "florian"
+  :account/name "bybit florian demo1" 
+  :account/notes "bybit trade testnet"
+  :account/api :bybit-trade 
+  :account/settings {:connection {:mode :test}
+                     :login {:api-key "CtOKK6YezfVvOGmc0f"
+                             :api-secret "7HLHsB6f7XGbGPP42gunCVklQSIslaLgdur5"}}}
+ ]
