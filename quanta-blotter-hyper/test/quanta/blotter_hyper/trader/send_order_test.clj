@@ -30,7 +30,8 @@
                 4 "fpaper-reject"
                 5 "fpaper fast/bad"
                 6 "fpaper corrupt"
-                1000 "pepperstone demo1"}
+                1000 "pepperstone demo1"
+                2000 "bybit florian demo1"}
                (send-order/trader-accounts conn "florian"))))
       (finally
         (datahike/db-stop conn)))))
