@@ -80,28 +80,6 @@
                {:data-on:click (h/action (notifications/mark-read! sim/notifications* notificationId))}
                "mark read"]]])]]])]))
 
-(defn quotelist-table
-  [quotes]
-  [:table.quotelist-table
-   [:thead
-    [:tr
-     [:th "Asset"]
-     [:th "Account"]
-     [:th "Bid"]
-     [:th "Ask"]
-     [:th "Time"]]]
-   [:tbody
-    (if (empty? quotes)
-      [:tr [:td {:colspan 5} "No quotes yet"]]
-      (for [[asset {:keys [account bid ask ts]}]
-           (sort-by key quotes)]
-        [:tr {:key asset}
-         [:td asset]
-         [:td account]
-         [:td (fmt-num bid)]
-         [:td (fmt-num ask)]
-         [:td.time (if ts (str ts) "—")]]))]])
-
 (defn trades-table
   [trades]
   [:motion.div.trades-table-wrap
@@ -145,8 +123,6 @@
    [:a (h/navigate :layout) "Layout"]
    " · "
    [:a (h/navigate :highcharts-random) "Highcharts random"]
-   " · "
-   [:a (h/navigate :quotelist) "Quote list"]
    " · "
    [:a (h/navigate :simulator) "Simulator"]
    " · "

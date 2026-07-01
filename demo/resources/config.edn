@@ -20,7 +20,8 @@
            :assets-file "demo-assets.edn"
            :lists-dir "demo-lists"}
 
- :oms-server {:ns-require [fix-engine.blotter.fix-trade]
+ :oms-server {:ns-require [fix-engine.blotter.account
+                           quanta.bybit.blotter.account]
               :log-file "log/oms-server-trace.txt"
               :transaction-log-file "log/oms-server-transaction.txt"
               :validate? true
@@ -29,4 +30,9 @@
               :trading-state-print-interval-ms 15000}
 
  :test-order {:account-id 3
-              :interval-sec 30}}
+              :interval-sec 30}
+
+ :quote-manager {:quote-accounts-file "demo-quote-accounts.edn"
+                 :log-file "log/quotes.txt"
+                 :ns-require [fix-engine.quote.account
+                              quanta.bybit.quote.account]}}

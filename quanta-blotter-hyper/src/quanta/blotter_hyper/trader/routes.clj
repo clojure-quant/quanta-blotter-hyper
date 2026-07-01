@@ -11,7 +11,8 @@
    [quanta.blotter-hyper.trader.accounts :refer [accounts-page]]
    [quanta.blotter-hyper.trader.backoffice :refer [backoffice-page]]
    [quanta.blotter-hyper.trader.home :refer [home-page]]
-   [quanta.blotter-hyper.trader.live :refer [live-page]]))
+   [quanta.blotter-hyper.trader.live :refer [live-page]]
+   [quanta.blotter-hyper.trader.quotes :refer [quotes-page]]))
 
 
 (defn- with-roles
@@ -47,5 +48,11 @@
                         :title "Live"
                         :get #'live-page
                         :middleware [wrap-ctx
-                                     wrap-identity]})]]))
+                                     wrap-identity]})]
+     ["/trader/quotes" (with-roles #{:trader}
+                         {:name :trader/quotes
+                          :title "Quotes"
+                          :get #'quotes-page
+                          :middleware [wrap-ctx
+                                       wrap-identity]})]]))
 

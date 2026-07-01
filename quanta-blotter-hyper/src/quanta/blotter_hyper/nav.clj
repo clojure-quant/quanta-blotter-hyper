@@ -11,6 +11,8 @@
    [:div.blotter-nav-links
     [:a (h/navigate :trader/live) "Live"]
     " · "
+    [:a (h/navigate :trader/quotes) "Quotes"]
+    " · "
     [:a (h/navigate :trader/backoffice) "Backoffice"]
     " · "
     [:a (h/navigate :trader/accounts) "Accounts"]]

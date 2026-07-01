@@ -8,9 +8,9 @@
 
   ;; trading
   :db {:start (quanta.util.datahike/db-start
-               {:schema (concat 
+               {:schema (concat
                          (deref quanta.blotter.oms.db/schema)
-                         (deref quanta.blotter-hyper.db.schema/schema))
+                         (deref quanta.asset.schema/asset))
                 :db-path (get-in (clip/ref :config) [:db :dir])
                 :uuid (get-in (clip/ref :config) [:db :uuid])
                 :seed-fn [(quanta.blotter.account-manager/seed-edn-accounts
@@ -37,6 +37,10 @@
                           (clip/ref :oms-server))
                   :stop (.stop this)}
 
+  :quote-manager {:start (quanta.quote.core/create-quote-manager
+                          (assoc (:quote-manager (clip/ref :config))
+                                 :db (clip/ref :db)))}
+
   :sim {:start (antman.sim.state/start!)
         :stop (antman.sim.state/stop!)}
 
@@ -44,7 +48,7 @@
   :ctx {:start {:db (clip/ref :db)
                 :token (clip/ref :token)
                 :oms-server (clip/ref :oms-server)
-                }}
+                :quote-manager (clip/ref :quote-manager)}}
   :token {:start (quanta.blotter-hyper.auth/start-token-service! (clip/ref :config))}
   :sse-heartbeat {:start (antman.sse.heartbeat/start!)
                   :stop (antman.sse.heartbeat/stop!)}
@@ -58,7 +62,7 @@
   ;; nrepl
   :nrepl {:start (nrepl.server/start-server :bind "0.0.0.0" :port 9100)
           :stop (.close this)}
-  
+
   :reload {:start (clj-reload.core/init
                    {:dirs ["src" "../quanta-blotter-hyper/src"]
                     ;:no-reload '#{user}

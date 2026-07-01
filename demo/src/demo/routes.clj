@@ -7,7 +7,6 @@
    [antman.ui.highcharts-random-page :refer [highcharts-random-page]]
    [antman.ui.layout-page :refer [layout-page]]
    [antman.ui.panels :refer [positions-panel trades-panel]]
-   [antman.ui.quotelist-page :refer [quotelist-page]]
    [antman.ui.simulator-page :refer [simulator-page]]
    [antman.ui.trading :refer [trading-page]]))
 
@@ -48,11 +47,6 @@
       {:name :panel-trades
        :title "Trades"
        :get #'trades-panel})]
-   ["/quotelist"
-    (with-roles #{:viewer :trader}
-      {:name :quotelist
-       :title "Quote list"
-       :get #'quotelist-page})]
    ["/simulator"
     (with-roles #{:admin}
       {:name :simulator

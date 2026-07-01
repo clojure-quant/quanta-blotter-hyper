@@ -57,12 +57,6 @@ body {
   padding: 1rem;
 }
 
-.quotelist-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-
 body:has(.layout-page),
 body:has(.highcharts-random-page) {
   overflow: hidden;
@@ -160,6 +154,14 @@ tr:nth-child(even) {
 }
 
 .positions-table td.price.price-flash-down {
+  animation: price-flash-down 0.9s ease-out;
+}
+
+.quotes-table td.price.price-flash-up {
+  animation: price-flash-up 0.9s ease-out;
+}
+
+.quotes-table td.price.price-flash-down {
   animation: price-flash-down 0.9s ease-out;
 }
 
@@ -737,6 +739,81 @@ tr:nth-child(even) {
 .live-column h2 {
   font-size: 1rem;
   margin: 0 0 0.5rem;
+}
+
+.quotes-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 2rem);
+  padding: 0 1rem 1rem;
+  box-sizing: border-box;
+}
+
+.quotes-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.75rem;
+}
+
+.quotes-header {
+  flex: 0 0 20%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.quotes-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.quotes-header select {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.4rem;
+  background: #2a2a4a;
+  color: #eee;
+  border: 1px solid #444;
+  border-radius: 3px;
+}
+
+.quotes-main {
+  flex: 1 1 80%;
+  min-height: 0;
+  overflow: auto;
+}
+
+.quotes-table-wrap {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.quotes-table {
+  font-size: 0.75rem;
+  border-collapse: collapse;
+  white-space: nowrap;
+  width: max-content;
+  table-layout: auto;
+}
+
+.quotes-table th,
+.quotes-table td {
+  padding: 0.15rem 0.4rem;
+  border-bottom: 1px solid #2a2a4a;
+  text-align: left;
+}
+
+.quotes-table th {
+  color: #aaa;
+  font-weight: 600;
+}
+
+.quotes-table td.time {
+  font-family: monospace;
+  font-size: 0.7rem;
 }
 
 .send-order-panel {

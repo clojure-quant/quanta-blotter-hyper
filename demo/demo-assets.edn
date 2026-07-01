@@ -109,7 +109,7 @@
   :asset/category :crypto
   :asset/market :crypto
   :asset/margin 20
-  :asset/default-quote-account 2
+  :asset/default-quote-account 3
   :asset/bybit [:spot "BTCUSDT"]}
  {:asset/symbol "ETHUSDT.S.BB"
   :asset/name "Ethereum / Tether (Bybit spot)"
@@ -117,7 +117,7 @@
   :asset/category :crypto
   :asset/market :crypto
   :asset/margin 20
-  :asset/default-quote-account 2
+  :asset/default-quote-account 3
   :asset/bybit [:spot "ETHUSDT"]}
  {:asset/symbol "BTCUSDT.LF.BB"
   :asset/name "Bitcoin / Tether (Bybit linear perpetual)"
@@ -141,11 +141,11 @@
   :asset/category :fx
   :asset/market :fx
   :asset/margin 10
-  :asset/default-quote-account 3}
+  :asset/default-quote-account 4}
  {:asset/symbol "__TEST2"
   :asset/name "Test symbol 2"
   :asset/exchange "TEST"
   :asset/category :fx
   :asset/market :fx
   :asset/margin 10
-  :asset/default-quote-account 3}]
+  :asset/default-quote-account 4}]
