@@ -26,16 +26,17 @@
                        (clip/ref :db))
                :stop (quanta.blotter.oms.server/stop-oms-server this)}
 
-  :test-order-poller {:start (demo.test-order-sender/start-order-poller
-                              (:oms (clip/ref :oms-server))
-                              (:test-order (clip/ref :config)))
-                      :stop (demo.test-order-sender/stop-order-poller this)}
-
-  :socket-server {:start (quanta.blotter.cli.server/start-socket-server
-                          (:oms (clip/ref :oms-server))
-                          (clip/ref :db)
-                          (clip/ref :oms-server))
-                  :stop (.stop this)}
+  ;:test-order-poller 
+  ;  {:start (demo.test-order-sender/start-order-poller
+  ;         (:oms (clip/ref :oms-server))
+  ;         (:test-order (clip/ref :config))
+  ;  :stop (demo.test-order-sender/stop-order-poller this)}
+  
+  ;:socket-server {:start (quanta.blotter.cli.server/start-socket-server
+  ;                        (:oms (clip/ref :oms-server))
+   ;                       (clip/ref :db)
+    ;                      (clip/ref :oms-server))
+   ;               :stop (.stop this)}
 
   :quote-manager {:start (quanta.quote.core/create-quote-manager
                           (assoc (:quote-manager (clip/ref :config))

@@ -6,9 +6,7 @@
    [quanta.blotter-hyper.admin.routes :as admin-routes]
    [antman.ui.highcharts-random-page :refer [highcharts-random-page]]
    [antman.ui.layout-page :refer [layout-page]]
-   [antman.ui.panels :refer [positions-panel trades-panel]]
-   [antman.ui.simulator-page :refer [simulator-page]]
-   [antman.ui.trading :refer [trading-page]]))
+   [antman.ui.simulator-page :refer [simulator-page]]))
 
 (defn- with-roles
   [required-roles route-data]
@@ -20,13 +18,8 @@
          :hyper/disabled? true
          :get (fn [req]
                 (if (auth/signed-in? req)
-                  {:status 302 :headers {"Location" "/trading"} :body ""}
+                  {:status 302 :headers {"Location" "/trader/live"} :body ""}
                   {:status 302 :headers {"Location" "/login"} :body ""}))}]
-   ["/trading1"
-    (with-roles #{:trader}
-      {:name :trader1
-       :title "Trading"
-       :get #'trading-page})]
    ["/layout"
     (with-roles #{:trader}
       {:name :layout
@@ -37,16 +30,6 @@
       {:name :highcharts-random
        :title "Highcharts random"
        :get #'highcharts-random-page})]
-   ["/panels/positions"
-    (with-roles #{:trader}
-      {:name :panel-positions
-       :title "Positions"
-       :get #'positions-panel})]
-   ["/panels/trades"
-    (with-roles #{:trader}
-      {:name :panel-trades
-       :title "Trades"
-       :get #'trades-panel})]
    ["/simulator"
     (with-roles #{:admin}
       {:name :simulator

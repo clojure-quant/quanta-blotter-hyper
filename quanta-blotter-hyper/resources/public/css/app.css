@@ -876,6 +876,21 @@ tr:nth-child(even) {
   background: #1e6f31;
 }
 
+.send-order-cancel {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  background: #8a2b2b;
+  color: #fff;
+  border: 1px solid #6f1e1e;
+  border-radius: 3px;
+  align-self: flex-end;
+}
+
+.send-order-cancel:hover {
+  background: #6f1e1e;
+}
+
 .send-order-preview {
   margin: 0.5rem 0 0;
   padding: 0.4rem 0.5rem;

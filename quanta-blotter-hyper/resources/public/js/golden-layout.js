@@ -11,7 +11,7 @@ let attachTimer = null
 const DESTROY_DELAY_MS = 100
 const INIT_DEBOUNCE_MS = 50
 
-const PANEL_IDS = ["panel-positions", "panel-trades", "panel-notifications"]
+const PANEL_IDS = ["panel-notifications"]
 
 const LAYOUT_CONFIG = {
   root: {
@@ -23,25 +23,6 @@ const LAYOUT_CONFIG = {
         title: "Memo",
         size: "15%",
         minSize: "80px",
-      },
-      {
-        type: "row",
-        content: [
-          {
-            type: "component",
-            componentType: "positions",
-            title: "Positions",
-            size: "50%",
-            minSize: "120px",
-          },
-          {
-            type: "component",
-            componentType: "trades",
-            title: "Trades",
-            size: "50%",
-            minSize: "120px",
-          },
-        ],
       },
     ],
   },
@@ -94,8 +75,6 @@ function attachStreamPanel(panelElId, containerKey) {
 }
 
 function attachStreamPanels() {
-  attachStreamPanel("panel-positions", "positions")
-  attachStreamPanel("panel-trades", "trades")
   attachStreamPanel("panel-notifications", "notifications")
 }
 
@@ -105,16 +84,6 @@ function registerComponents(layout) {
     el.className = "memo-panel"
     el.innerHTML = "<p>welcome to ant-man-trading</p>"
     fillContainer(container, el)
-  })
-
-  layout.registerComponentFactoryFunction("positions", (container) => {
-    panelContainers.positions = container.element
-    attachStreamPanel("panel-positions", "positions")
-  })
-
-  layout.registerComponentFactoryFunction("trades", (container) => {
-    panelContainers.trades = container.element
-    attachStreamPanel("panel-trades", "trades")
   })
 
   layout.registerComponentFactoryFunction("notifications", (container) => {
@@ -275,8 +244,6 @@ function destroyLayout() {
     }
     layoutInstance = null
   }
-  panelContainers.positions = null
-  panelContainers.trades = null
   panelContainers.notifications = null
   updateNotificationsToggleButton()
 }
@@ -361,7 +328,7 @@ function watchForLayoutHost() {
   const observer = new MutationObserver(() => {
     const host = document.getElementById("golden-layout-host")
     if (!host) {
-      if (layoutInstance || panelContainers.positions) {
+      if (layoutInstance || panelContainers.notifications) {
         scheduleDestroy()
       }
       return
@@ -370,7 +337,7 @@ function watchForLayoutHost() {
     bindLayoutToolbar()
     if (host.dataset.glInit !== "true") {
       scheduleTryInit()
-    } else if (panelContainers.positions) {
+    } else if (panelContainers.notifications) {
       scheduleAttachPanels()
     }
   })

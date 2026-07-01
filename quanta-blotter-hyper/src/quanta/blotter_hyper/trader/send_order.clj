@@ -31,7 +31,9 @@
    (default-state nil))
   ([account-id]
    {:account account-id
+    :cancel-account account-id
     :order-id (new-order-id)
+    :cancel-order-id ""
     :asset "EURUSD"
     :side :buy
     :order-type :limit
@@ -81,6 +83,45 @@
         (m/? (oms/create-order oms details))
         (reset-order-id! state-a))
       (reset! error-a (validation-error state)))))
+
+(defn state->cancel-details
+  "Maps cancel-order form state to `cancel-order` arguments."
+  [state]
+  {:account/id (:cancel-account state)
+   :order-id (:cancel-order-id state)
+   :asset (:asset state)})
+
+(defn state->cancel-message
+  [state]
+  (assoc (state->cancel-details state) :type :trader/cancel-order))
+
+(defn cancel-validation-error
+  [state]
+  (if (seq (:cancel-order-id state))
+    (schema/human-error-trader-message (state->cancel-message state))
+    "order-id required"))
+
+(defn valid-cancel-order?
+  [state]
+  (boolean
+   (and (seq (:cancel-order-id state))
+        (schema/validate-trader-message (state->cancel-message state)))))
+
+(defn clear-cancel-order-id!
+  [state-a]
+  (swap! state-a assoc :cancel-order-id ""))
+
+(defn cancel!
+  "Cancel an order via the OMS and clear the cancel order-id field."
+  [oms state-a error-a]
+  (let [state @state-a
+        details (state->cancel-details state)]
+    (if (valid-cancel-order? state)
+      (do
+        (reset! error-a nil)
+        (m/? (oms/cancel-order oms details))
+        (clear-cancel-order-id! state-a))
+      (reset! error-a (cancel-validation-error state)))))
 
 (defn- keyword-from-select
   "Parse select value to a simple keyword. Avoids `(keyword \":buy\")` -> `::buy`."
@@ -171,6 +212,16 @@
        {:type "button"
         :data-on:click (h/action (submit! oms state-a error-a))}
        "Send order"]]
+     [:div.send-order-form
+      (select-field "account" (:cancel-account state)
+                    (account-options accounts)
+                    (update-field :cancel-account #(Long/parseLong ^String %)))
+      (text-field "order-id" (:cancel-order-id state)
+                  (update-field :cancel-order-id identity))
+      [:button.send-order-cancel
+       {:type "button"
+        :data-on:click (h/action (cancel! oms state-a error-a))}
+       "Cancel order"]]
      (when validation-error
        [:div.send-order-error
         [:p "cannot send order, schema validation error"]

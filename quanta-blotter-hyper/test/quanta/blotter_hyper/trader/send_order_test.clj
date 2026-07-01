@@ -62,3 +62,25 @@
       (is (false? (send-order/valid-new-order? state)))
       (is (map? (send-order/validation-error state)))
       (is (contains? (send-order/validation-error state) :qty)))))
+
+(deftest cancel-order-test
+  (testing "cancel details use cancel account, asset, and cancel order-id"
+    (let [state (assoc (send-order/default-state 1)
+                        :cancel-account 1000
+                        :cancel-order-id "abc123"
+                        :asset "USDJPY")]
+      (is (= {:account/id 1000
+              :order-id "abc123"
+              :asset "USDJPY"}
+             (send-order/state->cancel-details state)))))
+
+  (testing "valid cancel order"
+    (let [state (assoc (send-order/default-state 1) :cancel-order-id "abc123")]
+      (is (send-order/valid-cancel-order? state))))
+
+  (testing "empty cancel order-id is invalid"
+    (is (not (send-order/valid-cancel-order? (send-order/default-state 1)))))
+
+  (testing "empty cancel order-id returns error message"
+    (is (= "order-id required"
+           (send-order/cancel-validation-error (send-order/default-state 1))))))

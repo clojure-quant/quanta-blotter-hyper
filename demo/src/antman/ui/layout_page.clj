@@ -18,12 +18,6 @@
     {:data-on-load "antmanInitLayout()"}
     [:motion.div#gl-mount]]
    [:motion.div#panel-stash.panel-stash
-    (h/reactive [sim/positions*]
-      [:motion.div#panel-positions.panel-root
-       (ui/positions-table @sim/positions*)])
-    (h/reactive [sim/trades*]
-      [:motion.div#panel-trades.panel-root
-       (ui/trades-table @sim/trades*)])
     (h/reactive [sim/notifications*]
       [:motion.div#panel-notifications.panel-root
        (ui/notifications-panel @sim/notifications*)])]])

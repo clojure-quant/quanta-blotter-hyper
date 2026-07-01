@@ -15,4 +15,4 @@
    :static-resources "public"
    :head #'head-tags
    :middleware [auth/wrap-hydrate-identity]
-   :watches [#'sim/positions* #'sim/trades* #'sim/notifications* #'heartbeat/server-ts*]))
+   :watches [#'sim/notifications* #'heartbeat/server-ts*]))

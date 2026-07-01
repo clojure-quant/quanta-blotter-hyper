@@ -14,6 +14,11 @@ Web Frontend for quanta-blotter
 cd demo
 clojure -X:run
 ```
+Open:
+
+- http://localhost:3000 (Hyper frontend)
+- http://localhost:9000 (Flowy OMS socket server)
+
 
 Services are defined in `resources/services.edn` and started via [modular](https://github.com/pink-gorilla/modular) / juxt.clip.
 
@@ -22,10 +27,7 @@ Configuration:
 - `resources/config.edn` — web server port, token/OAuth2, logging
 - `resources/users.edn` — local user accounts (hashed passwords)
 
-Open:
 
-- http://localhost:3000 (Hyper frontend)
-- http://localhost:9000 (Flowy OMS socket server)
 
 The demo also starts a seeded Datahike trade DB, OMS server, and test-order poller (same stack as quanta-blotter/demo `:cli-server`). Delete `demo/trade-db-oms-server` to reset the database.
 
@@ -56,4 +58,4 @@ clojure -M:test
 | Layout | [Golden Layout](https://golden-layout.github.io/golden-layout/) v2 |
 | Services | [modular](https://github.com/pink-gorilla/modular) |
 
-Demo `:run` uses a seeded trade DB and OMS for `/backoffice` and `/accounts`. The antman sim pages still use in-memory `positions*` and `trades*` atoms with Hyper watches for live HTML updates.
+
