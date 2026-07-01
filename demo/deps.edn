@@ -24,4 +24,7 @@
          :main-opts ["-m" "cognitect.test-runner"]
          :exec-fn cognitect.test-runner.api/test}
   :lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2026.05.25"}}
-         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test" "deps.edn" "--fail-level" "error"]}}}
+         :main-opts ["-m" "clj-kondo.main" "--lint" "src" "test" "deps.edn" "--fail-level" "error"]}
+
+  :lint-imports {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2026.05.25"}}
+                 :main-opts ["-m" "clj-kondo.main" "--dependencies" "--copy-configs" "--parallel"]}}}

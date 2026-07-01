@@ -29,9 +29,21 @@ jobs:
         with:
           cli: latest
 
+      - name: Import clj-kondo configs (library)
+        working-directory: quanta-blotter-hyper
+        run: |
+          mkdir -p .clj-kondo
+          clojure -M:lint-imports --lint "$(clojure -Spath)"
+
       - name: Lint
         working-directory: quanta-blotter-hyper
         run: clojure -M:lint
+
+      - name: Import clj-kondo configs (demo)
+        working-directory: demo
+        run: |
+          mkdir -p .clj-kondo
+          clojure -M:lint-imports --lint "$(clojure -Spath)"
 
       - name: Lint demo
         working-directory: demo
