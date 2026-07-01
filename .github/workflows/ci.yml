@@ -30,6 +30,7 @@ jobs:
           cli: latest
 
       - name: Lint
+        working-directory: quanta-blotter-hyper
         run: clojure -M:lint
 
       - name: Lint demo
