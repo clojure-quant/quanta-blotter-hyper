@@ -1,7 +1,6 @@
 {:paths ["src" "resources"]
  :deps {org.clojure/clojure {:mvn/version "1.12.4"}
-        io.github.clojure-quant/quanta-blotter-hyper {:local/root "../quanta-blotter-hyper" :deps/manifest :deps}
-        io.github.clojure-quant/quanta-blotter {:local/root "../../quanta-blotter/blotter" :deps/manifest :deps}
+        io.github.clojure-quant/quanta-blotter-hyper {:local/root "../quanta-blotter-hyper" :deps/manifest :deps} 
         io.github.clojure-quant/quanta-blotter-cli {:mvn/version "0.1.78"}
         io.github.clojure-quant/fix-engine {:mvn/version "0.1.71"}
         io.github.clojure-quant/quanta-bybit {:mvn/version "0.1.9"}
