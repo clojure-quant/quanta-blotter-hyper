@@ -111,17 +111,32 @@
   [state-a]
   (swap! state-a assoc :cancel-order-id ""))
 
-(defn cancel!
-  "Cancel an order via the OMS and clear the cancel order-id field."
-  [oms state-a error-a]
-  (let [state @state-a
-        details (state->cancel-details state)]
+(defn order->cancel-state
+  "Maps a working order to cancel form state."
+  [order]
+  {:cancel-account (:order/account-id order)
+   :cancel-order-id (str (:order/id order))
+   :asset (:order/asset order)})
+
+(defn- do-cancel!
+  [oms error-a state on-success]
+  (let [details (state->cancel-details state)]
     (if (valid-cancel-order? state)
       (do
         (reset! error-a nil)
         (m/? (oms/cancel-order oms details))
-        (clear-cancel-order-id! state-a))
+        (when on-success (on-success)))
       (reset! error-a (cancel-validation-error state)))))
+
+(defn cancel!
+  "Cancel an order via the OMS and clear the cancel order-id field."
+  [oms state-a error-a]
+  (do-cancel! oms error-a @state-a #(clear-cancel-order-id! state-a)))
+
+(defn cancel-by-order!
+  "Cancel a working order via the OMS using its account-id and order-id."
+  [oms order error-a]
+  (do-cancel! oms error-a (order->cancel-state order) nil))
 
 (defn- keyword-from-select
   "Parse select value to a simple keyword. Avoids `(keyword \":buy\")` -> `::buy`."

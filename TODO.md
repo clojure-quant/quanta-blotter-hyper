@@ -7,11 +7,7 @@
   - shows connected browsers.
   - switch to view of trader.
 
-
-time	acct	trader	acct name	camp	lbl	id	asset	D	qty	OT	lmt	status	wkg	fill	avg	Message
-2026-07-01 14:24:46.795	1000	florian	pepperstone demo1	manual order	manual	MiIS3g	EURUSD	B	10000	LMT	1.1036	working	10000			—
-2026-07-01 14:23:34.179	1000	florian	pepperstone demo1	manual order	manual	GgdZWH	EURUSD	B	10000	LMT	1.1035	working	10000			—
-2026-07-01 14:23:31.148	1000	florian	pepperstone demo1	manual order	manual	KAxuPb	EURUSD	B	10000	LMT	1.1035	working	10000			—
+		—
 
 
  (h/reactive [sim/trades*]

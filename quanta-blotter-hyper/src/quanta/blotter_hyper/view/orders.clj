@@ -1,6 +1,8 @@
 (ns quanta.blotter-hyper.view.orders
   (:require
    [datahike.api :refer [q]]
+   [hyper.core :as h]
+   [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
 
@@ -25,52 +27,64 @@
                       ""))}
    (common/fmt-cell status)])
 
+(defn- cancel-order-cell [order {:keys [oms error-a]}]
+  [:td
+   [:button.send-order-cancel
+    {:type "button"
+     :data-on:click (h/action (send-order/cancel-by-order! oms order error-a))}
+    "Cancel"]])
+
 (defn orders-table
-  [orders]
-  (let [orders (sort-by :order/date #(compare %2 %1) orders)]
-    [:div.orders-table-wrap
-     [:table.orders-table
-      [:thead
-       [:tr
-        [:th.time "time"]
-        [:th "acct"]
-        [:th "trader"]
-        [:th "acct name"]
-        [:th "camp"]
-        [:th "lbl"]
-        [:th "id"]
-        [:th "asset"]
-        [:th.side-col "D"]
-        [:th.num "qty"]
-        [:th "OT"]
-        [:th "lmt"]
-        [:th "status"]
-        [:th "wkg"]
-        [:th.num "fill"]
-        [:th.num "avg"]
-        [:th "Message"]]]
-      [:tbody
-       (if (empty? orders)
-         [:tr [:td {:colspan 17} "No orders"]]
-         (for [order orders]
-           [:tr {:key (:order/id order)}
-            [:td.time (common/fmt-instant-utc (:order/date order))]
-            [:td (common/fmt-cell (:order/account-id order))]
-            [:td (common/fmt-cell (:order/trader order))]
-            [:td (common/fmt-cell (:order/account-name order))]
-            [:td (common/fmt-cell (:order/campaign order))]
-            [:td (common/fmt-cell (:order/label order))]
-            [:td (common/fmt-cell (:order/id order))]
-            [:td (common/fmt-cell (:order/asset order))]
-            (common/side-cell (:order/side order))
-            [:td.num (common/fmt-cell (:order/qty order))]
-            (order-type-cell (:order/type order))
-            [:td (common/fmt-cell (:order/limit order))]
-            (status-cell (:order/status order))
-            (wkg-cell (:order/qty-working order))
-            [:td.num (common/fmt-pos-num (:order/qty-filled order))]
-            [:td.num (when-let [avg (:order/avg-price order)] (str avg))]
-            [:td (common/fmt-cell (:order/text order))]]))]]]))
+  ([orders] (orders-table orders nil))
+  ([orders cancel-opts]
+   (let [orders (sort-by :order/date #(compare %2 %1) orders)
+         cancel? (some? cancel-opts)
+         col-count (if cancel? 18 17)]
+     [:div.orders-table-wrap
+      [:table.orders-table
+       [:thead
+        [:tr
+         [:th.time "time"]
+         [:th "acct"]
+         [:th "trader"]
+         [:th "acct name"]
+         [:th "camp"]
+         [:th "lbl"]
+         [:th "id"]
+         [:th "asset"]
+         [:th.side-col "D"]
+         [:th.num "qty"]
+         [:th "OT"]
+         [:th "lmt"]
+         [:th "status"]
+         [:th "wkg"]
+         [:th.num "fill"]
+         [:th.num "avg"]
+         [:th "Message"]
+         (when cancel? [:th ""])]]
+       [:tbody
+        (if (empty? orders)
+          [:tr [:td {:colspan col-count} "No orders"]]
+          (for [order orders]
+            [:tr {:key (:order/id order)}
+             [:td.time (common/fmt-instant-utc (:order/date order))]
+             [:td (common/fmt-cell (:order/account-id order))]
+             [:td (common/fmt-cell (:order/trader order))]
+             [:td (common/fmt-cell (:order/account-name order))]
+             [:td (common/fmt-cell (:order/campaign order))]
+             [:td (common/fmt-cell (:order/label order))]
+             [:td (common/fmt-cell (:order/id order))]
+             [:td (common/fmt-cell (:order/asset order))]
+             (common/side-cell (:order/side order))
+             [:td.num (common/fmt-cell (:order/qty order))]
+             (order-type-cell (:order/type order))
+             [:td (common/fmt-cell (:order/limit order))]
+             (status-cell (:order/status order))
+             (wkg-cell (:order/qty-working order))
+             [:td.num (common/fmt-pos-num (:order/qty-filled order))]
+             [:td.num (when-let [avg (:order/avg-price order)] (str avg))]
+             [:td (common/fmt-cell (:order/text order))]
+             (when cancel? (cancel-order-cell order cancel-opts))]))]]])))
 
 (defn- enrich-order [order]
   (common/enrich-account-fields order

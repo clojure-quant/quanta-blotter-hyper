@@ -74,7 +74,9 @@
                      (positions-view/positions-table open-positions)]
                     [:section.live-column
                      [:h2 "Working orders"]
-                     (orders-view/orders-table working-orders)]]]
+                     (orders-view/orders-table working-orders
+                                               {:oms oms
+                                                :error-a order-error-a})]]]
                   (send-order/panel {:state-a order-state-a
                                      :error-a order-error-a
                                      :accounts accounts

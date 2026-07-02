@@ -891,6 +891,11 @@ tr:nth-child(even) {
   background: #6f1e1e;
 }
 
+.orders-table .send-order-cancel {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.45rem;
+}
+
 .send-order-preview {
   margin: 0.5rem 0 0;
   padding: 0.4rem 0.5rem;

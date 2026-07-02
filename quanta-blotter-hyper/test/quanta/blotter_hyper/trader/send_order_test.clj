@@ -83,4 +83,15 @@
 
   (testing "empty cancel order-id returns error message"
     (is (= "order-id required"
-           (send-order/cancel-validation-error (send-order/default-state 1))))))
+           (send-order/cancel-validation-error (send-order/default-state 1)))))
+
+  (testing "working order maps to cancel details"
+    (let [order {:order/account-id 1000
+                 :order/id "abc123"
+                 :order/asset "EURUSD"}
+          state (send-order/order->cancel-state order)]
+      (is (= {:account/id 1000
+              :order-id "abc123"
+              :asset "EURUSD"}
+             (send-order/state->cancel-details state)))
+      (is (send-order/valid-cancel-order? state)))))
