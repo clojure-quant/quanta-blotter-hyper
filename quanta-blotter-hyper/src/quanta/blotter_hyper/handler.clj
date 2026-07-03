@@ -1,8 +1,6 @@
 (ns quanta.blotter-hyper.handler
   (:require
-   [hyper.core :as h]
-   [quanta.blotter-hyper.auth :as auth]
-   ))
+   [hyper.core :as h]))
 
 (defn head-tags
   [_req]
