@@ -10,10 +10,13 @@
   :db {:start (quanta.util.datahike/db-start
                {:schema (concat
                          (deref quanta.blotter.oms.db/schema)
-                         (deref quanta.asset.schema/asset))
+                         (deref quanta.asset.schema/asset)
+                         (deref modular.permission.user.datahike/schema))
                 :db-path (get-in (clip/ref :config) [:db :dir])
                 :uuid (get-in (clip/ref :config) [:db :uuid])
-                :seed-fn [(quanta.blotter.account-manager/seed-edn-accounts
+                :seed-fn [(quanta.blotter-hyper.users/seed-edn-users
+                           (get-in (clip/ref :config) [:db-seed :users-file]))
+                          (quanta.blotter.account-manager/seed-edn-accounts
                            (get-in (clip/ref :config) [:db-seed :accounts-file]))
                           (quanta.asset.seed/seed-edn-assets-fn
                            (get-in (clip/ref :config) [:db-seed :assets-file]))
@@ -42,19 +45,25 @@
                           (assoc (:quote-manager (clip/ref :config))
                                  :db (clip/ref :db)))}
 
-  :sim {:start (antman.sim.state/start!)
-        :stop (antman.sim.state/stop!)}
+  :sim {:start (playground.notification.state/start!)
+        :stop (playground.notification.state/stop!)}
 
   ;; web
+  :user-manager {:start (modular.permission.user.datahike/create-user-manager
+                         (clip/ref :db))}
   :ctx {:start {:db (clip/ref :db)
                 :token (clip/ref :token)
                 :oms-server (clip/ref :oms-server)
                 :quote-manager (clip/ref :quote-manager)}}
-  :token {:start (quanta.blotter-hyper.auth/start-token-service! (clip/ref :config))}
-  :sse-heartbeat {:start (antman.sse.heartbeat/start!)
-                  :stop (antman.sse.heartbeat/stop!)}
-  :routes {:start (demo.routes/routes (clip/ref :ctx))}
-  :handler {:start (demo.handler/create-handler (clip/ref :routes))}
+  :token {:start (quanta.blotter-hyper.auth/start-token-service!
+                  (clip/ref :config)
+                  (clip/ref :user-manager))}
+  :sse-heartbeat {:start (quanta.blotter-hyper.status.core/start!)
+                  :stop (quanta.blotter-hyper.status.core/stop!)}
+  :routes {:start (playground.routes/routes (clip/ref :ctx))}
+  :handler {:start (quanta.blotter-hyper.handler/create-handler
+                    (clip/ref :routes)
+                    [(deref playground.notification.state/notifications*)])}
   :hyper {:start (hyper.core/start!
                   (clip/ref :handler)
                   (:web-server (clip/ref :config)))

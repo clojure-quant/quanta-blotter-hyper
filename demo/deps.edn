@@ -9,11 +9,10 @@
  :aliases
  {:run {:extra-deps {io.github.tonsky/clj-reload {:mvn/version "1.0.0"}}
         :exec-fn modular.system/start!
-        :exec-args {:config ["config.edn" "users.edn"]
+        :exec-args {:config ["config.edn"]
                     :services "services.edn"
                     :profile "default"
                     :version "prod1"}}
-  :hash-users {:exec-fn quanta.blotter-hyper.users/hash-users-file!}
   :cli-asset-list-print {:exec-fn demo.cli-asset-list-print/start-cli}
   :dev {:extra-paths ["dev"]
         :extra-deps {io.github.tonsky/clj-reload {:mvn/version "1.0.0"}}}

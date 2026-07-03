@@ -25,7 +25,7 @@ Services are defined in `resources/services.edn` and started via [modular](https
 Configuration:
 
 - `resources/config.edn` — web server port, token/OAuth2, logging
-- `resources/users.edn` — local user accounts (hashed passwords)
+- `resources/users.edn` — local user accounts (plain or hashed passwords; hashed on db seed)
 
 
 
@@ -35,13 +35,9 @@ nREPL listens on port **9100** when the app is running.
 
 ## Users and passwords
 
-`token` compares login passwords against **pre-hashed** values in `users.edn` (blake2b-128 hex). Passwords are not hashed on each app start.
+`users.edn` may use plain-text or pre-hashed `:user/password` values. On database seed, plain passwords are hashed (blake2b-128 hex) before they are stored in Datahike; the database always holds hashes.
 
-To add or change a user:
-
-1. Edit `resources/users.edn` with plain-text `:password` values.
-2. Run `clojure -X:hash-users` once to write hashes back to the file.
-3. Start the app with `clojure -X:run`.
+To add or change a user, edit `resources/users.edn` and delete `demo/trade-db-oms-server` so the db is recreated and users are re-seeded.
 
 ## Test
 

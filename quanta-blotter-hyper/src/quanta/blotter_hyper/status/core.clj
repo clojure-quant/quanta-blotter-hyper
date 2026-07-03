@@ -1,9 +1,10 @@
-(ns antman.sse.heartbeat
-  "Server timestamp pushed over SSE (~1 Hz) for connection health checks."
+(ns quanta.blotter-hyper.status.core
+  "Server instant pushed over SSE (~1 Hz) for connection health checks."
   (:require
-   [missionary.core :as m]))
+   [missionary.core :as m]
+   [tick.core :as t]))
 
-(def server-ts* (atom 0))
+(def server-time-a (atom nil))
 
 (defonce heartbeat-disposer* (atom nil))
 
@@ -11,7 +12,7 @@
   []
   (m/ap
     (m/?> (m/seed (repeat nil)))
-    (reset! server-ts* (System/currentTimeMillis))
+    (reset! server-time-a (t/now))
     (m/? (m/sleep 1000))))
 
 (defn start!

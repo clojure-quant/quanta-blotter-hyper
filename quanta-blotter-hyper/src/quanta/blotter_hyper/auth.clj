@@ -7,8 +7,8 @@
 (defonce token* (atom nil))
 
 (defn start-token-service!
-  [{:keys [users token]}]
-  (let [token-cfg {:users users
+  [{:keys [token]} user-manager]
+  (let [token-cfg {:user-manager user-manager
                    :secret (:secret token)
                    :store-path (:store-path token)
                    :providers (:oauth2 token)

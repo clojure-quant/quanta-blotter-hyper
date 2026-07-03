@@ -1,27 +1,27 @@
 {:users
- {:admin
-  {:password "3e037862f67083f048cd1cd611adfdea",
-   :roles #{:admin},
-   :email ["admin@example.com"]},
-  :viewer
-  {:password "2cf93d67884e1e50e65bfa71671c55ec",
-   :roles #{:viewer},
-   :email ["viewer@example.com"]},
+ [{:user/name "admin"
+   :user/password "3e037862f67083f048cd1cd611adfdea"
+   :user/roles #{:admin}
+   :user/email ["admin@example.com"]}
+  {:user/name "viewer"
+   :user/password "2cf93d67884e1e50e65bfa71671c55ec"
+   :user/roles #{:viewer}
+   :user/email ["viewer@example.com"]}
   ;; trader to do permanent __TEST orders.
-  :testtrader
-  {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
-   :roles #{:trader},
-   :email ["trader@example.com"]},
+  {:user/name "testtrader"
+   :user/password "5fcdcab954b67c06ca3f8b57358c9b1b"
+   :user/roles #{:trader}
+   :user/email ["trader@example.com"]}
   ;; real traders here
-  :florian
-  {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
-   :roles #{:trader :admin},
-   :email ["trader@example.com"]},
-  :ant
-  {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
-   :roles #{:trader},
-   :email ["trader@example.com"]},
-  :arne
-  {:password "5fcdcab954b67c06ca3f8b57358c9b1b",
-   :roles #{:trader},
-   :email ["trader@example.com"]}}}
+  {:user/name "florian"
+   :user/password "5fcdcab954b67c06ca3f8b57358c9b1b"
+   :user/roles #{:trader :admin}
+   :user/email ["trader@example.com"]}
+  {:user/name "ant"
+   :user/password "5fcdcab954b67c06ca3f8b57358c9b1b"
+   :user/roles #{:trader}
+   :user/email ["trader@example.com"]}
+  {:user/name "arne"
+   :user/password "5fcdcab954b67c06ca3f8b57358c9b1b"
+   :user/roles #{:trader}
+   :user/email ["trader@example.com"]}]}

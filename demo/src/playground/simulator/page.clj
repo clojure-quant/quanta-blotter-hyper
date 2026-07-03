@@ -1,10 +1,10 @@
-(ns antman.ui.simulator-page
+(ns playground.simulator.page
   (:require
    [cheshire.core :as json]
    [clojure.string :as str]
    [hyper.core :as h]
-   [antman.simulator.signal :as sim-signal]
-   [antman.ui.components :as ui]))
+   [playground.nav :refer [nav]]
+   [playground.simulator.util :as sim-signal]))
 
 (defn- sig [trade path]
   (h/signal path (sim-signal/field-default trade path)))
@@ -120,7 +120,7 @@
         tp-signals (vec (for [n (range (count (:take-profits trade)))]
                           (take-profit-signals trade n)))]
     [:motion.div.simulator-page
-     (ui/nav)
+     (nav)
      [:h1 "Signal simulator"]
      [:div.simulator-form
       [:div.simulator-grid

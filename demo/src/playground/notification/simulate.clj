@@ -1,4 +1,4 @@
-(ns antman.sim.notifications
+(ns playground.notification.simulate
   (:require
    [missionary.core :as m])
   (:import [java.time Instant]

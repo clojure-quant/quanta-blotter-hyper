@@ -1,7 +1,7 @@
-(ns antman.simulator-page-test
+(ns playground.simulator.util-test
   (:require
    [clojure.test :refer [deftest is testing]]
-   [antman.simulator.signal :as sim-signal]))
+   [playground.simulator.util :as sim-signal]))
 
 (deftest load-signal-test
   (testing "loads trade from signal.json"

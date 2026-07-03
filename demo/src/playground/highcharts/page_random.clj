@@ -1,11 +1,11 @@
-(ns antman.ui.highcharts-random-page
+(ns playground.highcharts.page-random
   (:require
-   [antman.ui.components :as ui]))
+   [playground.nav :refer [nav]]))
 
 (defn highcharts-random-page
   [_req]
   [:motion.div.highcharts-random-page
-   (ui/nav)
+   (nav)
    [:h1 "Highcharts random"]
    [:p.muted
     "12 scrolling line charts · 180 points each · +1 price tick per second per chart."]

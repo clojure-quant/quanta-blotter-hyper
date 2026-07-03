@@ -17,8 +17,8 @@
       (ns antman.ui.panels
   (:require
    [hyper.core :as h]
-   [antman.sim.state :as sim]
-   [antman.ui.components :as ui]))
+   [playground.notification.state :as notification-state]
+   [quanta.blotter-hyper.status.view :refer [sse-connection-status]]))
 
 (defn register-panel!
   [_ panel-kw]
@@ -30,7 +30,7 @@
   (h/watch! sim/positions*)
   (h/reactive [sim/positions*]
     [:motion.div#panel-positions.panel-root
-     (ui/sse-connection-status)
+     (sse-connection-status)
      [:h2 "Positions"]
      (ui/positions-table @sim/positions*)]))
 

@@ -1,11 +1,11 @@
-(ns antman.simulator.signal
+(ns playground.simulator.util
   (:require
    [camel-snake-kebab.core :as csk]
    [cheshire.core :as json]
    [clojure.java.io :as io]
    [clojure.string :as str]))
 
-(def resource-path "antman/signal.json")
+(def resource-path "playground/simulator/signal.json")
 
 (def ^:private optional-nil-fields
   #{:net-r :closed-at :close-reason :broker-position-id})

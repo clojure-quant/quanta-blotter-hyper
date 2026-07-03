@@ -2,7 +2,7 @@
   (:require
    [clojure.edn :as edn]
    [clojure.java.io :as io]
-   [clojure.pprint :as pprint]
+   [modular.permission.user.datahike :as user-db]
    [token.identity.local :as local-identity]))
 
 (defn- password-hashed?
@@ -13,45 +13,35 @@
        (boolean (re-matches #"[0-9a-f]+" s))))
 
 (defn hash-passwords
-  "Hash plain-text :password values; leave already-hashed passwords unchanged."
+  "Hash plain-text :user/password values; leave already-hashed passwords unchanged."
   [users]
-  (into {}
-        (map (fn [[id user]]
-               [id (update user :password
-                           #(if (password-hashed? %) % (local-identity/pwd-hash %)))])
-             users)))
+  (mapv (fn [user]
+          (update user :user/password
+                    #(if (password-hashed? %) % (local-identity/pwd-hash %))))
+        users))
 
-(defn- write-edn-file!
-  [path data]
-  (with-open [w (io/writer path)]
-    (binding [*print-length* nil
-              *print-level* nil]
-      (pprint/pprint data w))))
-
-(defn- users-file
+(defn- slurp-edn-path
+  "Load EDN from classpath (resources/) or filesystem path."
   [path]
-  (let [file (io/file path)]
-    (when-not (.exists file)
-      (throw (ex-info "users.edn not found" {:path (.getAbsolutePath file)})))
-    file))
+  (if-let [resource (io/resource path)]
+    (slurp resource)
+    (let [file (io/file path)]
+      (when-not (.exists file)
+        (throw (ex-info "users.edn not found"
+                        {:path path
+                         :absolute (.getAbsolutePath file)})))
+      (slurp file))))
 
-(defn- hash-users-file* [path]
-  (let [file (users-file path)
-        data (edn/read-string (slurp file))
+(defn load-edn-users
+  [path]
+  (let [data (edn/read-string (slurp-edn-path path))
         users (:users data)]
-    (when-not (map? users)
-      (throw (ex-info "users.edn must contain a :users map" {:path path :users users})))
-    (let [hashed (assoc data :users (hash-passwords users))]
-      (write-edn-file! file hashed)
-      (println "Hashed passwords written to" (.getPath file))
-      hashed)))
+    (when-not (sequential? users)
+      (throw (ex-info "users.edn must contain a :users vector" {:path path :users users})))
+    users))
 
-(defn hash-users-file!
-  "Read users.edn, hash any plain-text passwords, write hashes back to the file.
-
-  Callable via `clojure -X:hash-users` (ignores the exec-args map)."
-  ([] (hash-users-file* "resources/users.edn"))
-  ([arg]
-   (if (string? arg)
-     (hash-users-file* arg)
-     (hash-users-file* "resources/users.edn"))))
+(defn seed-edn-users
+  "Returns a db seed-fn that transacts users from an edn file.
+   Plain-text passwords in the seed file are hashed before transact."
+  [path]
+  (user-db/seed-users (hash-passwords (load-edn-users path))))

@@ -9,6 +9,36 @@
   const POLL_MS = 500
   const RETRY_MS = 3000
 
+  let audioCtx = null
+
+  function beepOnce() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext
+      if (!Ctx) return
+      if (!audioCtx) audioCtx = new Ctx()
+      if (audioCtx.state === "suspended") {
+        void audioCtx.resume()
+      }
+
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+      const t0 = audioCtx.currentTime
+
+      osc.type = "sine"
+      osc.frequency.setValueAtTime(880, t0)
+      gain.gain.setValueAtTime(0.0001, t0)
+      gain.gain.exponentialRampToValueAtTime(0.2, t0 + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.35)
+
+      osc.connect(gain)
+      gain.connect(audioCtx.destination)
+      osc.start(t0)
+      osc.stop(t0 + 0.35)
+    } catch {
+      /* audio unavailable */
+    }
+  }
+
   function tick() {
     const root = document.getElementById(ROOT_ID)
     if (!root) return
@@ -17,7 +47,12 @@
       document.getElementById("sse-server-ts")?.getAttribute("data-server-ts") || 0,
     )
     const stale = ts > 0 && Date.now() - ts > STALE_MS
+    const wasStale = root.classList.contains("is-stale")
     root.classList.toggle("is-stale", stale)
+
+    if (stale && !wasStale) {
+      beepOnce()
+    }
 
     if (!stale) {
       delete root.dataset.reconnecting

@@ -1,6 +1,7 @@
 (ns quanta.blotter-hyper.nav
   (:require
-   [hyper.core :as h]))
+   [hyper.core :as h]
+   [quanta.blotter-hyper.status.view :refer [sse-connection-status]]))
 
 (defn- current-user-name []
   (some-> @(h/session-cursor :identity) :user name))
@@ -8,6 +9,7 @@
 (defn trader-nav
   []
   [:nav.app-nav.blotter-nav
+   (sse-connection-status)
    [:div.blotter-nav-links
     [:a (h/navigate :trader/live) "Live"]
     " · "
@@ -21,6 +23,7 @@
 (defn admin-nav
   []
   [:nav.app-nav.blotter-nav
+   (sse-connection-status)
    [:div.blotter-nav-links
     [:a (h/navigate :admin/live) "Live"]
     " · "

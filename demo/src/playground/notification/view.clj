@@ -1,10 +1,9 @@
-(ns antman.ui.components
+(ns playground.notification.view
   (:require
-   [hyper.context :as ctx]
    [hyper.core :as h]
-   [antman.sim.notifications :as notifications]
-   [antman.sim.state :as sim]
-   [antman.sse.heartbeat :as heartbeat]))
+   [playground.nav :refer [nav]]
+   [playground.notification.state :as notification-state]
+   [playground.notification.simulate :as notifications]))
 
 (defn- severity-class [severity]
   (case severity
@@ -44,29 +43,17 @@
              [:td.trade-id tradeId]
              [:td.actions
               [:button.mark-read-btn
-               {:data-on:click (h/action (notifications/mark-read! sim/notifications* notificationId))}
+               {:data-on:click (h/action (notifications/mark-read! notification-state/notifications* notificationId))}
                "mark read"]]])]]])]))
 
-(defn sse-connection-status
-  "Banner when SSE timestamps stop updating for >2s.
-   Stale detection + auto-reconnect live in /js/sse-reconnect.js."
-  []
-  (let [tab-id (:hyper/tab-id ctx/*request*)]
-    [:motion.div#sse-connection-status.sse-connection-status
-     (when tab-id {:data-tab-id tab-id})
-     (h/reactive [heartbeat/server-ts*]
-                 [:motion.span#sse-server-ts
-                  {:data-server-ts @heartbeat/server-ts*
-                   :hidden true}])
-     [:motion.div.sse-interrupted "server connection interrupted"]]))
 
-(defn nav
-  []
-  [:nav.app-nav
-   [:a (h/navigate :layout) "Layout"]
-   " · "
-   [:a (h/navigate :highcharts-random) "Highcharts random"]
-   " · "
-   [:a (h/navigate :simulator) "Simulator"]
-   " · "
-   [:a {:href "/me"} "User"]])
+(defn notifications-component []
+  (h/reactive [notification-state/notifications*]
+    [:motion.div#panel-notifications.panel-root
+     (notifications-panel @notification-state/notifications*)]))
+
+(defn notifications-page
+  [_req]
+  [:motion.div.notifications-page
+   (nav)
+   (notifications-component)])

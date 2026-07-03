@@ -1,6 +1,6 @@
-(ns antman.sim.state
+(ns playground.notification.state
   (:require
-   [antman.sim.notifications :as notifications-sim]))
+   [playground.notification.simulate :as notifications-sim]))
 
 (def notifications* (atom []))
 
