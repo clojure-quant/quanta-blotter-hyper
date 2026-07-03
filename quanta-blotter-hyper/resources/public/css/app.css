@@ -777,8 +777,14 @@ tr:nth-child(even) {
 
 .live-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
+}
+
+@media (min-width: 100em) {
+  .live-columns {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .live-column h2 {

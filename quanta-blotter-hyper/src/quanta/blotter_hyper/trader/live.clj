@@ -35,9 +35,10 @@
    {:mount (fn []
              (let [db (:db env)
                    oms (get-in env [:oms-server :oms])
-                   _ (println "*** live-page ctx: " (keys env))
+                   quote-manager (:quote-manager env)
                    _ (assert db ":db needs to be in :ctx")
                    _ (assert oms ":oms-server :oms needs to be in :ctx")
+                   _ (assert quote-manager ":quote-manager needs to be in :ctx")
                    ts (get-in env [:oms-server :trading-state-trader])
                    _ (assert ts ":oms-server :trading-state-trader needs to be in :ctx")
                    identity @(h/session-cursor :identity)
@@ -53,13 +54,14 @@
                          :accounts accounts
                          :assets (send-order/available-assets)
                          :oms oms
+                         :quote-manager quote-manager
                          :trader trader
                          :dispose! (start-trader-live-processor trader ts data-a)}]
                (h/watch! data-a)
                (h/watch! order-state-a)
                (h/watch! order-error-a)
                this))
-    :render (fn [{:keys [data-a order-state-a order-error-a accounts assets oms]} _req]
+    :render (fn [{:keys [data-a order-state-a order-error-a accounts assets oms quote-manager]} _req]
               (let [{:keys [open-positions working-orders]}
                     (or @data-a {:open-positions [] :working-orders []})]
                 [:motion.div.live-page
@@ -81,6 +83,7 @@
                                      :error-a order-error-a
                                      :accounts accounts
                                      :assets assets
-                                     :oms oms})]]))
+                                     :oms oms
+                                     :quote-manager quote-manager})]]))
     :unmount (fn [{:keys [dispose!]}]
                (dispose!))}))

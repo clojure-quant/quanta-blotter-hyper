@@ -5,7 +5,10 @@
    [hyper.core :as h]
    [quanta.blotter.oms.core :as oms]
    [quanta.blotter.oms.db :as db]
-   [quanta.blotter.oms.validation.schema :as schema]))
+   [quanta.blotter.oms.validation.schema :as schema]
+   [quanta.quote.core :refer [quote-snapshot]]))
+
+(def quote-snapshot-timeout-ms 1000)
 
 (defn available-assets
   []
@@ -71,6 +74,14 @@
 (defn reset-order-id!
   [state-a]
   (swap! state-a assoc :order-id (new-order-id)))
+
+(defn on-asset-change!
+  "Update `:asset` and set `:limit` to the quote bid when a snapshot arrives."
+  [quote-manager state-a error-a asset]
+  (reset! error-a nil)
+  (swap! state-a assoc :asset asset)
+  (when-let [quote (m/? (quote-snapshot quote-manager quote-snapshot-timeout-ms asset))]
+    (swap! state-a assoc :limit (bigdec (:bid quote)))))
 
 (defn submit!
   "Submit a new order to the order manager and reset `:order-id`."
@@ -189,8 +200,9 @@
 
 (defn panel
   "Reusable send-order panel. Expects `state-a` atom, `error-a` atom, `accounts`
-  map from `trader-accounts`, `assets` from `available-assets`, and `oms`."
-  [{:keys [state-a error-a accounts assets oms]}]
+  map from `trader-accounts`, `assets` from `available-assets`, `oms`, and
+  `quote-manager` for asset-change quote snapshots."
+  [{:keys [state-a error-a accounts assets oms quote-manager]}]
   (let [state @state-a
         order-data (state->order-details state)
         validation-error @error-a
@@ -208,7 +220,7 @@
       (text-field "order-id" (:order-id state) identity {:readonly true})
       (select-field "asset" (:asset state)
                     (map vector assets assets)
-                    (update-field :asset identity))
+                    #(on-asset-change! quote-manager state-a error-a %))
       (select-field "side" (:side state)
                     [[:buy "buy"] [:sell "sell"]]
                     (update-field :side keyword-from-select))
