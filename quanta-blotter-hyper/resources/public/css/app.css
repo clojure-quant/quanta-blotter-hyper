@@ -595,6 +595,42 @@ tr:nth-child(even) {
   background: #3a5f8f;
 }
 
+.winbox-page {
+  padding: 1rem;
+}
+
+.winbox-page .app-nav {
+  margin-bottom: 1rem;
+}
+
+.winbox-open-btn {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  background: #2a3f5f;
+  color: #e0e0e0;
+  border: 1px solid #4a6a8f;
+  border-radius: 3px;
+}
+
+.winbox-open-btn:hover {
+  background: #3a5f8f;
+}
+
+.winbox-body {
+  padding: 0.75rem 1rem;
+}
+
+.winbox-body h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.winbox-body p {
+  margin: 0;
+  color: #ccc;
+}
+
 .simulator-toast {
   margin: 0.35rem 0 0;
   padding: 0.35rem 0.6rem;

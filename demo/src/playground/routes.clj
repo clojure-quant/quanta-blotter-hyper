@@ -9,7 +9,8 @@
    [playground.golden-layout.page :refer [layout-page]]
    [playground.highcharts.page-random :refer [highcharts-random-page]]
    [playground.notification.view :refer [notifications-page]]
-   [playground.simulator.page :refer [simulator-page]]))
+   [playground.simulator.page :refer [simulator-page]]
+   [playground.winbox.page :refer [winbox-page]]))
 
 
 (defn playground-home-page
@@ -43,7 +44,10 @@
                    :get #'simulator-page}]
     ["/notifications" {:name :playground/notifications
                        :title "Notifications"
-                       :get #'notifications-page}]]])
+                       :get #'notifications-page}]
+    ["/winbox" {:name :playground/winbox
+                :title "Winbox"
+                :get #'winbox-page}]]])
 
 
 (defn routes [{:keys [token] :as ctx}]

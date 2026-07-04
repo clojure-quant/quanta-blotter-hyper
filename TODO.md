@@ -2,24 +2,6 @@
 
 
 
-- admin panel
-  - user management
-  - shows connected browsers.
-  - switch to view of trader.
-
-		—
-
-
- (h/reactive [sim/trades*]
-      (ui/trades-table @sim/trades*))
-
-
-      (ns antman.ui.panels
-  (:require
-   [hyper.core :as h]
-   [playground.notification.state :as notification-state]
-   [quanta.blotter-hyper.status.view :refer [sse-connection-status]]))
-
 (defn register-panel!
   [_ panel-kw]
   (reset! (h/tab-cursor [:active-panels panel-kw] false) true))

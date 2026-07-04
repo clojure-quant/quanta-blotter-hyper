@@ -15,4 +15,6 @@
    " · "
    [:a (h/navigate :playground/notifications) "Notifications"]
    " · "
+   [:a (h/navigate :playground/winbox) "Winbox"]
+   " · "
    [:a {:href "/me"} "User"]])
