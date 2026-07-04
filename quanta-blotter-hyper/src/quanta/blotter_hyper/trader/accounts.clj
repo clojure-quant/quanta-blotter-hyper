@@ -55,22 +55,47 @@
                    data-a (atom nil)
                    api-a (atom :paper)
                    query-a (atom (assoc query-options :trader trader))
+                   editing-a (atom nil)
+                   edit-value-a (atom "")
+                   settings-dialog-a (atom nil)
+                   settings-text-a (atom "")
+                   settings-error-a (atom nil)
                    query-f (m/watch query-a)
                    this {:data-a data-a
                          :api-a api-a
                          :query-a query-a
+                         :editing-a editing-a
+                         :edit-value-a edit-value-a
+                         :settings-dialog-a settings-dialog-a
+                         :settings-text-a settings-text-a
+                         :settings-error-a settings-error-a
                          :trader trader
                          :db db
                          :dispose! (start-query-processor db query-f data-a)}]
                (h/watch! data-a)
+               (h/watch! editing-a)
+               (h/watch! edit-value-a)
+               (h/watch! settings-dialog-a)
+               (h/watch! settings-text-a)
+               (h/watch! settings-error-a)
                this))
-    :render (fn [{:keys [data-a api-a query-a trader db]} _req]
+    :render (fn [{:keys [data-a api-a query-a editing-a edit-value-a
+                         settings-dialog-a settings-text-a settings-error-a
+                         trader db]} _req]
               [:motion.div.accounts-page
                (nav/trader-nav)
                (accounts-header api-a query-a db trader)
                (if-let [data @data-a]
                  (if (:rows data)
-                   (accounts-view/accounts-table (:rows data))
+                   (accounts-view/accounts-table (:rows data)
+                                                 {:editable? true
+                                                  :editing-a editing-a
+                                                  :edit-value-a edit-value-a
+                                                  :settings-dialog-a settings-dialog-a
+                                                  :settings-text-a settings-text-a
+                                                  :settings-error-a settings-error-a
+                                                  :db db
+                                                  :query-a query-a})
                    [:p "Loading…"])
                  [:p "Loading…"])])
     :unmount (fn [{:keys [dispose!]}]

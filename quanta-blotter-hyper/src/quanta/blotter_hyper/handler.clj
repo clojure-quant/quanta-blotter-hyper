@@ -13,7 +13,8 @@
            :href "https://cdn.jsdelivr.net/npm/golden-layout@2.6.0/dist/css/themes/goldenlayout-dark-theme.css"}]
    [:script {:type "module" :src "/js/golden-layout.js?v=4"}]
    [:script {:type "module" :src "/js/highcharts-random.js?v=4"}]
-   [:script {:src "https://cdn.jsdelivr.net/npm/winbox@0.2.82/dist/winbox.bundle.min.js"}]])
+   [:script {:src "https://cdn.jsdelivr.net/npm/winbox@0.2.82/dist/winbox.bundle.min.js"}]
+   [:script {:src "/js/beep.js" :defer true}]])
 
 (defn create-handler
   "Ring handler for Hyper.
