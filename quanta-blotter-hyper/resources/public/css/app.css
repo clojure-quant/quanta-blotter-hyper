@@ -631,6 +631,102 @@ tr:nth-child(even) {
   color: #ccc;
 }
 
+.decimal-page {
+  padding: 1rem;
+}
+
+.decimal-page .app-nav {
+  margin-bottom: 1rem;
+}
+
+.decimal-hint {
+  margin: 0.5rem 0 1rem;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.decimal-editor {
+  position: relative;
+  display: inline-block;
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  min-width: 12rem;
+}
+
+.decimal-highlight-layer,
+.decimal-editor .decimal-input {
+  font: inherit;
+  letter-spacing: 0;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border: 1px solid #4a6a8f;
+  border-radius: 3px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.decimal-highlight-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  white-space: pre;
+  color: #e0e0e0;
+  background: #1a1a2e;
+  border-color: transparent;
+}
+
+.decimal-highlight-layer .decimal-char {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+}
+
+.decimal-highlight-layer .decimal-active {
+  background: #c47a20;
+  color: #1a1a2e;
+  border-radius: 2px;
+}
+
+.decimal-editor .decimal-input {
+  position: relative;
+  background: transparent;
+  color: transparent;
+  caret-color: #e0e0e0;
+  outline: none;
+}
+
+.decimal-editor .decimal-input:focus {
+  border-color: #6a9acf;
+}
+
+.decimal-meta {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.decimal-step-value {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  color: #c47a20;
+}
+
+.decimal-display {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.decimal-display-value {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  color: #a8e6a3;
+}
+
+.decimal-display-step {
+  font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+  color: #c47a20;
+}
+
 .simulator-toast {
   margin: 0.35rem 0 0;
   padding: 0.35rem 0.6rem;

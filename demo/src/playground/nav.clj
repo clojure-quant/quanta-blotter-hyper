@@ -17,4 +17,6 @@
    " · "
    [:a (h/navigate :playground/winbox) "Winbox"]
    " · "
+   [:a (h/navigate :playground/decimal) "Decimal"]
+   " · "
    [:a {:href "/me"} "User"]])

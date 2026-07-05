@@ -10,7 +10,8 @@
    [playground.highcharts.page-random :refer [highcharts-random-page]]
    [playground.notification.view :refer [notifications-page]]
    [playground.simulator.page :refer [simulator-page]]
-   [playground.winbox.page :refer [winbox-page]]))
+   [playground.winbox.page :refer [winbox-page]]
+   [playground.decimal.page :refer [decimal-page]]))
 
 
 (defn playground-home-page
@@ -47,7 +48,10 @@
                        :get #'notifications-page}]
     ["/winbox" {:name :playground/winbox
                 :title "Winbox"
-                :get #'winbox-page}]]])
+                :get #'winbox-page}]
+    ["/decimal" {:name :playground/decimal
+                 :title "Decimal input"
+                 :get #'decimal-page}]]])
 
 
 (defn routes [{:keys [token] :as ctx}]
