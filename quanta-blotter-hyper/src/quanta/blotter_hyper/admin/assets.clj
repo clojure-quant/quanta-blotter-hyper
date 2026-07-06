@@ -2,7 +2,6 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.view.assets :as assets-view]))
 
 (defn- process-query [db-conn _query]
@@ -36,7 +35,7 @@
                this))
     :render (fn [{:keys [data-a]} _req]
               [:motion.div.assets-page
-               (nav/admin-nav)
+               ((:admin/nav env))
                [:header.assets-header
                 [:h1 "Assets"]]
                (if-let [data @data-a]

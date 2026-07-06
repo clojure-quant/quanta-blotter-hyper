@@ -54,7 +54,9 @@
   :ctx {:start {:db (clip/ref :db)
                 :token (clip/ref :token)
                 :oms-server (clip/ref :oms-server)
-                :quote-manager (clip/ref :quote-manager)}}
+                :quote-manager (clip/ref :quote-manager)
+                :trader/nav (deref quanta.blotter-hyper.nav/trader-nav)
+                :admin/nav (deref quanta.blotter-hyper.nav/admin-nav)}}
   :token {:start (quanta.blotter-hyper.auth/start-token-service!
                   (clip/ref :config)
                   (clip/ref :user-manager))}

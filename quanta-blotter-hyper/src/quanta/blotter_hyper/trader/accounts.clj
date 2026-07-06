@@ -2,7 +2,6 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter.oms.db :as db]))
 
@@ -83,7 +82,7 @@
                          settings-dialog-a settings-text-a settings-error-a
                          trader db]} _req]
               [:motion.div.accounts-page
-               (nav/trader-nav)
+               ((:trader/nav env))
                (accounts-header api-a query-a db trader)
                (if-let [data @data-a]
                  (if (:rows data)

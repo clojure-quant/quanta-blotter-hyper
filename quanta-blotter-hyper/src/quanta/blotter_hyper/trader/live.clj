@@ -2,7 +2,6 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
@@ -65,7 +64,7 @@
               (let [{:keys [open-positions working-orders]}
                     (or @data-a {:open-positions [] :working-orders []})]
                 [:motion.div.live-page
-                 (nav/trader-nav)
+                 ((:trader/nav env))
                  [:div.live-layout
                   [:div.live-main
                    [:header.live-header

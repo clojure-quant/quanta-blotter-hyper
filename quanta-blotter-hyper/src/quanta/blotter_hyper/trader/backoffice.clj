@@ -2,7 +2,6 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.trades :as trades-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
@@ -78,9 +77,9 @@
                (dispose!))}))
 
 (defn backoffice-page
-  ([req]
+  ([{:keys [hyper/env] :as req}]
    (let [identity @(h/session-cursor :identity)
          trader (name (:user identity))]
-     (backoffice-page* nav/trader-nav req {:trader trader})))
+     (backoffice-page* (:trader/nav env) req {:trader trader})))
   ([nav-fn req query-options]
    (backoffice-page* nav-fn req query-options)))

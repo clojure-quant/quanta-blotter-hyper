@@ -2,7 +2,6 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.view.accounts :as accounts-view]))
 
 (defn- process-query [db-conn _query]
@@ -54,7 +53,7 @@
     :render (fn [{:keys [data-a query-a editing-a edit-value-a
                          settings-dialog-a settings-text-a settings-error-a db]} _req]
               [:motion.div.accounts-page
-               (nav/admin-nav)
+               ((:admin/nav env))
                [:header.accounts-header
                 [:h1 "Accounts"]]
                (if-let [data @data-a]

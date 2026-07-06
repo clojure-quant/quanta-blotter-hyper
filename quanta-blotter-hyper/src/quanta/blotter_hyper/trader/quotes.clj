@@ -2,7 +2,6 @@
   (:require
    [hyper.core :as h]
    [quanta.asset.datahike :refer [list-names]]
-   [quanta.blotter-hyper.nav :as nav]
    [quanta.blotter-hyper.view.quotes :as quotes-view]
    [quanta.quote.core :refer [create-quotelist-consumer]]))
 
@@ -53,7 +52,7 @@
                 :dispose! dispose!}))
     :render (fn [{:keys [state-a list-a prev-a flash-quotes-a]} _req]
               [:motion.div.quotes-page
-               (nav/trader-nav)
+               ((:trader/nav env))
                [:div.quotes-layout
                 (quotes-header state-a list-a prev-a flash-quotes-a)
                 [:div.quotes-main
