@@ -2,7 +2,7 @@
   (:require
    [hyper.core :as h]
    [playground.nav :refer [nav]]
-   [playground.decimal.component :refer [decimal-input]]))
+   [quanta.blotter-hyper.component.decimal :refer [decimal-input]]))
 
 (defn decimal-page
   [_req]

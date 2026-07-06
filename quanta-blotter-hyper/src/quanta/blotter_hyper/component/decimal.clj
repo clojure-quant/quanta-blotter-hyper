@@ -1,4 +1,4 @@
-(ns playground.decimal.component
+(ns quanta.blotter-hyper.component.decimal
   (:require
    [hyper.core :as h]))
 
