@@ -846,6 +846,7 @@ tr:nth-child(even) {
 }
 
 .accounts-header select,
+.account-asset-list-cell select,
 .accounts-add,
 .account-settings-btn {
   font-size: 0.8rem;

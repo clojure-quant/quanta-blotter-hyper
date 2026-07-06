@@ -16,12 +16,12 @@
                 :uuid (get-in (clip/ref :config) [:db :uuid])
                 :seed-fn [(quanta.blotter-hyper.users/seed-edn-users
                            (get-in (clip/ref :config) [:db-seed :users-file]))
-                          (quanta.blotter.account-manager/seed-edn-accounts
-                           (get-in (clip/ref :config) [:db-seed :accounts-file]))
                           (quanta.asset.seed/seed-edn-assets-fn
                            (get-in (clip/ref :config) [:db-seed :assets-file]))
                           (quanta.asset.seed/seed-edn-lists-fn
-                           (get-in (clip/ref :config) [:db-seed :lists-dir]))]})
+                           (get-in (clip/ref :config) [:db-seed :lists-dir]))
+                          (quanta.blotter.account-manager/seed-edn-accounts
+                           (get-in (clip/ref :config) [:db-seed :accounts-file]))]})
        :stop (quanta.util.datahike/db-stop this)}
 
   :oms-server {:start (quanta.blotter.oms.server/start-oms-server

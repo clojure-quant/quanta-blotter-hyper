@@ -5,13 +5,14 @@
    [quanta.blotter-hyper.view.accounts :as accounts-view]))
 
 (defn- process-query [db-conn _query]
-  (accounts-view/query-accounts db-conn {}))
+  {:rows (accounts-view/query-accounts db-conn {})
+   :asset-lists (accounts-view/query-all-asset-lists db-conn)})
 
 (defn- process-query-f [db-conn query-f data-a]
   (m/ap
    (let [_query (m/?> query-f)
-         rows (m/? (m/via m/blk (process-query db-conn _query)))]
-     (reset! data-a {:rows rows})
+         data (m/? (m/via m/blk (process-query db-conn _query)))]
+     (reset! data-a data)
      nil)))
 
 (defn- start-query-processor [db-conn query-f data-a]
@@ -67,7 +68,8 @@
                                                   :settings-text-a settings-text-a
                                                   :settings-error-a settings-error-a
                                                   :db db
-                                                  :query-a query-a})
+                                                  :query-a query-a
+                                                  :asset-lists (:asset-lists data)})
                    [:p "Loading…"])
                  [:p "Loading…"])])
     :unmount (fn [{:keys [dispose!]}]

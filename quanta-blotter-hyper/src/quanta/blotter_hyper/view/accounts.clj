@@ -58,6 +58,27 @@
   (when query-a (swap! query-a update :n (fnil inc 0)))
   (effects/execute-script! "quantaBeep()"))
 
+(defn save-account-asset-list!
+  [db-conn account-id asset-list-id query-a]
+  (when (pos? asset-list-id)
+    (db/update-account db-conn {:account/id account-id
+                                :account/asset-list asset-list-id})
+    (when query-a (swap! query-a update :n (fnil inc 0)))
+    (effects/execute-script! "quantaBeep()")))
+
+(defn- account-asset-list-id [account]
+  (let [asset-list (:account/asset-list account)]
+    (cond
+      (number? asset-list) asset-list
+      (map? asset-list) (:db/id asset-list)
+      :else nil)))
+
+(defn- account-asset-list-name [account]
+  (let [asset-list (:account/asset-list account)]
+    (cond
+      (map? asset-list) (:lists/name asset-list)
+      :else nil)))
+
 (defn- editing?
   [editing-a account-id field]
   (let [e @editing-a]
@@ -143,6 +164,21 @@
         :checked enabled?
         :data-on:change (h/action (save-account-enabled! db account-id $checked query-a))}]
       [:span.account-enabled-slider-track]]]))
+
+(defn- account-asset-list-cell
+  [account {:keys [db query-a asset-lists]}]
+  (let [account-id (:account/id account)
+        selected-id (account-asset-list-id account)]
+    [:td.account-asset-list-cell
+     [:select {:value (str (or selected-id ""))
+               :data-on:change
+               (h/action (save-account-asset-list! db account-id (parse-long $value) query-a))}
+      (for [{:keys [db/id] :as asset-list} asset-lists
+            :let [list-name (:lists/name asset-list)]]
+        [:option {:key id
+                  :value (str id)
+                  :selected (= id selected-id)}
+         list-name])]]))
 
 (defn- fmt-settings [settings]
   (if (some? settings)
@@ -260,6 +296,9 @@
      [:td (common/fmt-cell (:account/enabled account))])
    [:td (common/fmt-cell (:account/api account))]
    (if editable?
+     (account-asset-list-cell account opts)
+     [:td (common/fmt-cell (account-asset-list-name account))])
+   (if editable?
      (account-settings-cell account opts)
      [:td.settings (fmt-settings (:account/settings account))])])
 
@@ -269,8 +308,9 @@
   ([accounts opts]
    (let [{:keys [show-trader? editable? editing-a edit-value-a
                  settings-dialog-a settings-text-a settings-error-a
-                 db query-a]
-          :or {show-trader? false}} opts
+                 db query-a asset-lists]
+          :or {show-trader? false
+               asset-lists []}} opts
          table-opts (cond-> {:show-trader? show-trader?}
                        editable?
                        (assoc :editing-a editing-a
@@ -280,6 +320,7 @@
                               :settings-error-a settings-error-a
                               :db db
                               :query-a query-a
+                              :asset-lists asset-lists
                               :editable? true))
          dialog-opts (select-keys table-opts [:settings-dialog-a :settings-text-a
                                               :settings-error-a :db :query-a])
@@ -287,7 +328,7 @@
                     (juxt :account/trader :account/id)
                     :account/id)
          accounts (sort-by sort-key accounts)
-         cols (if show-trader? 7 6)]
+         cols (if show-trader? 8 7)]
      [:div.orders-table-wrap
       (when editable? (account-settings-dialog dialog-opts))
       [:table.orders-table
@@ -299,21 +340,40 @@
          [:th.num "account balance"]
          [:th "enabled"]
          [:th "api type"]
+         [:th "asset-list"]
          [:th "settings"]]]
        [:tbody
         (if (empty? accounts)
           [:tr [:td {:colspan cols} "No accounts"]]
           (map #(account-row % table-opts) accounts))]]])))
 
+(defn- parse-account [account]
+  (update account :account/settings parse-settings-from-account))
+
+(defn query-all-asset-lists [conn]
+  (sort-by :lists/name
+           (d/q '[:find [(pull ?e [:db/id :lists/name]) ...]
+                  :where [?e :lists/name _]]
+                @conn)))
+
 (defn query-all-accounts [conn]
-  (->> (d/q '[:find [(pull ?e [*]) ...]
-               :where [?e :account/id _]]
+  (->> (d/q '[:find [(pull ?e [:db/id :account/id :account/trader :account/name
+                                :account/balance :account/enabled :account/api
+                                :account/settings
+                                {:account/asset-list [:db/id :lists/name]}]) ...]
+              :where [?e :account/id _]]
             @conn)
-       (map (fn [account]
-              (update account :account/settings parse-settings-from-account)))))
+       (map parse-account)))
 
 (defn query-trader-accounts [conn trader]
-  (db/trader-account-list conn trader))
+  (->> (d/q '[:find [(pull ?e [:db/id :account/id :account/trader :account/name
+                                :account/balance :account/enabled :account/api
+                                :account/settings
+                                {:account/asset-list [:db/id :lists/name]}]) ...]
+              :in $ ?trader
+              :where [?e :account/trader ?trader]]
+            @conn trader)
+       (map parse-account)))
 
 (defn query-accounts [conn {:keys [trader]}]
   (if trader
