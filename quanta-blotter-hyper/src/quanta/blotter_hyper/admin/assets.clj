@@ -28,19 +28,28 @@
                    _ (assert db ":db needs to be in :ctx")
                    data-a (atom nil)
                    query-a (atom {})
+                   edits-a (atom {})
                    query-f (m/watch query-a)
                    this {:data-a data-a
+                         :query-a query-a
+                         :edits-a edits-a
+                         :db db
                          :dispose! (start-query-processor db query-f data-a)}]
                (h/watch! data-a)
+               (h/watch! edits-a)
                this))
-    :render (fn [{:keys [data-a]} _req]
+    :render (fn [{:keys [data-a query-a edits-a db]} _req]
               [:motion.div.assets-page
                ((:admin/nav env))
                [:header.assets-header
                 [:h1 "Assets"]]
                (if-let [data @data-a]
                  (if (:rows data)
-                   (assets-view/assets-table (:rows data))
+                   (assets-view/assets-table (:rows data)
+                                             {:editable? true
+                                              :edits-a edits-a
+                                              :db db
+                                              :query-a query-a})
                    [:p "Loading…"])
                  [:p "Loading…"])])
     :unmount (fn [{:keys [dispose!]}]
