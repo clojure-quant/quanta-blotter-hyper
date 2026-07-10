@@ -86,16 +86,19 @@
 
 (defn- edit-keydown
   [save-fn editing-a account-id field]
-  (h/action {:when "((evt.key === 'Enter' && (window.__accountEditSavePending=true, true)) || evt.key === 'Escape')"}
-            (if (= $key "Escape")
-              (cancel-edit! editing-a account-id field)
-              (save-fn))))
+  (h/expr (when (or (= evt.key "Escape")
+                    (and (= evt.key "Enter")
+                         (set! (.-__accountEditSavePending js/window) true)))
+          (h/action (if (= $key "Escape")
+                      (cancel-edit! editing-a account-id field)
+                      (save-fn))))))
 
 (defn- edit-blur
   [editing-a account-id field cell-class]
-  (h/action {:when (str "(!window.__accountEditSavePending && !evt.relatedTarget?.closest('."
-                        cell-class "'))")}
-            (cancel-edit! editing-a account-id field)))
+  (h/expr (when (and (not (.-__accountEditSavePending js/window))
+                     (not (and (.-relatedTarget evt)
+                               (.closest (.-relatedTarget evt) (str "." cell-class)))))
+          (h/action (cancel-edit! editing-a account-id field)))))
 
 (defn- focus-edit-input!
   [selector]
