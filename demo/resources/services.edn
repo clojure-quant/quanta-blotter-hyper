@@ -63,9 +63,11 @@
   :sse-heartbeat {:start (quanta.blotter-hyper.status.core/start!)
                   :stop (quanta.blotter-hyper.status.core/stop!)}
   :routes {:start (playground.routes/routes (clip/ref :ctx))}
-  :handler {:start (quanta.blotter-hyper.handler/create-handler
+  :handler {:start (hyper.core/create-handler
                     (clip/ref :routes)
-                    [(deref playground.notification.state/notifications*)])}
+                    :static-resources "public"
+                    :head (deref demo.head/head-tags)
+                    :watches [(deref playground.notification.state/notifications*)])}
   :hyper {:start (hyper.core/start!
                   (clip/ref :handler)
                   (:web-server (clip/ref :config)))
