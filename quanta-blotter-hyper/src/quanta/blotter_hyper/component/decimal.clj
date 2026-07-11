@@ -6,7 +6,10 @@
 
 (h/defc decimal-input
   "Client-side decimal editor. Click a digit to choose the step; arrow up/down
-  adjust by that precision. Uses decimal.js for exact arithmetic."
+  adjust by that precision. Uses decimal.js for exact arithmetic.
+
+  Size via host `:class` (`big-decimal-editor` / `small-decimal-editor`)
+  and/or `:style` (CSS string) — these apply to the custom element host."
   {:require [["https://esm.sh/decimal.js@10.4.3" :as Decimal]]}
   [{:keys [value]}]
 
@@ -14,15 +17,11 @@
     (let [display (str (or value "0"))]
       [:div.decimal-editor
        [:div.decimal-highlight-layer display]
-       [:input.decimal-input {:type "text" :spellcheck false :value display}]
-       [:div.decimal-meta
-        [:span.decimal-step-label "Step: "]
-        [:span.decimal-step-value "—"]]]))
+       [:input.decimal-input {:type "text" :spellcheck false :value display}]]))
 
   (mount [root]
     (let [input-el     (.querySelector root ".decimal-input")
           highlight-el (.querySelector root ".decimal-highlight-layer")
-          step-el      (.querySelector root ".decimal-step-value")
           Decimal-ctor (or (.-default Decimal) Decimal)
           digit-char?
           (fn [ch]
@@ -100,8 +99,6 @@
                   digit (digit-at-caret text caret)
                   step  (step-for-digit text digit)]
               (set! (.-innerHTML highlight-el) (build-highlight text digit))
-              (set! (.-textContent step-el)
-                    (or (format-step step) "—"))
               (emit-state step)))
           apply-step!
           (fn [dir]

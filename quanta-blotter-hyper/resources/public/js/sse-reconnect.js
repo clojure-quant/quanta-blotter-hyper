@@ -74,8 +74,8 @@
     root.dataset.reconnecting = "true"
 
     try {
-      const path = window.location.pathname + window.location.search
-      const ping = await fetch(path, { cache: "no-store", credentials: "same-origin" })
+      const pingUrl = `${window.location.protocol}//${window.location.host}/token/me`
+      const ping = await fetch(pingUrl, { cache: "no-store", credentials: "same-origin" })
       if (!ping.ok) return
 
       window.location.reload()
