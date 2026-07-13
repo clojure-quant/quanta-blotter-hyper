@@ -25,7 +25,8 @@
        :stop (quanta.util.datahike/db-stop this)}
 
   :oms-server {:start (quanta.blotter.oms.server/start-oms-server
-                       (:oms-server (clip/ref :config))
+                       (assoc (:oms-server (clip/ref :config))
+                              :ctx {:quote-manager (clip/ref :quote-manager)})
                        (clip/ref :db))
                :stop (quanta.blotter.oms.server/stop-oms-server this)}
 
