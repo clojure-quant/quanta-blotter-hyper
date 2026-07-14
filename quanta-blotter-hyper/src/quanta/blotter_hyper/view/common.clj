@@ -22,8 +22,10 @@
 
 (defn side-cell [side]
   (case side
-    :buy [:td.side.profit "B"]
+    :buy  [:td.side.profit "B"]
+    :long [:td.side.profit "L"]
     :sell [:td.side.loss "S"]
+    :short [:td.side.loss "S"]
     [:td.side (fmt-cell side)]))
 
 (defn enrich-account-fields
@@ -35,3 +37,24 @@
                trader-key (:account/trader account))
         (dissoc account-db-key))
     entity))
+
+(defn substring-pred
+  "Datahike predicate: when `s` is non-empty, match strings that include it;
+  otherwise match any value."
+  [s]
+  (if (seq s)
+    (fn [v]
+      (and (string? v) (clojure.string/includes? v s)))
+    (constantly true)))
+
+(defn parse-account-id
+  "Parse account input to a long when it is a valid integer string; else nil."
+  [s]
+  (some-> s str clojure.string/trim not-empty parse-long))
+
+(defn account-filter-pred
+  "AND trader account pred with optional exact account-id."
+  [trader-pred account-id]
+  (if account-id
+    (fn [id] (and (= id account-id) (trader-pred id)))
+    trader-pred))

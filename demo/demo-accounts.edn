@@ -41,7 +41,7 @@
                      :fill-qty-prct [100]
                      :wait-seconds 1}}
  {:account/id 4
-  :account/enabled true
+  :account/enabled false
   :account/balance 10000M
   :account/currency "USD"
   :account/trader "florian"
@@ -55,7 +55,7 @@
                      :fill-qty-prct [100]
                      :wait-seconds 1}}
  {:account/id 5
-  :account/enabled true
+  :account/enabled false
   :account/balance 10000M
   :account/currency "USD"
   :account/trader "florian"
@@ -70,7 +70,7 @@
                      :wait-seconds 1}}
 
  {:account/id 6
-  :account/enabled true
+  :account/enabled false
   :account/balance 10000M
   :account/currency "USD"
   :account/trader "florian"

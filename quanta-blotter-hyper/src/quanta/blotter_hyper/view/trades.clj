@@ -47,18 +47,53 @@
                                 :fill/account-name
                                 :fill/trader))
 
-(defn query-fills-by-account-pred [conn account-id-pred]
-  (->> (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
-             :in $ ?account-id-pred
-             :where
-             [?e :fill/account-id ?account-id]
-             [(?account-id-pred ?account-id)]
-             [?e :fill/id _]]
-          @conn account-id-pred)
-       (mapv enrich-fill)))
+(defn- campaign-pred
+  "Substring match on campaign; used as a Datahike predicate."
+  [campaign]
+  (common/substring-pred campaign))
 
-(defn query-all-fills [conn]
-  (query-fills-by-account-pred conn (constantly true)))
+(defn- asset-pred
+  [asset]
+  (common/substring-pred asset))
 
-(defn query-fills [conn {:keys [trader]}]
-  (query-fills-by-account-pred conn (accounts-view/account-id-pred conn trader)))
+(defn query-fills-by-account-pred
+  ([conn account-id-pred]
+   (query-fills-by-account-pred conn account-id-pred nil nil))
+  ([conn account-id-pred campaign]
+   (query-fills-by-account-pred conn account-id-pred campaign nil))
+  ([conn account-id-pred campaign asset]
+   (->> (if (seq campaign)
+          (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
+               :in $ ?account-id-pred ?campaign-pred ?asset-pred
+               :where
+               [?e :fill/account-id ?account-id]
+               [(?account-id-pred ?account-id)]
+               [?e :fill/campaign ?c]
+               [(?campaign-pred ?c)]
+               [?e :fill/asset ?a]
+               [(?asset-pred ?a)]
+               [?e :fill/id _]]
+              @conn account-id-pred (campaign-pred campaign) (asset-pred asset))
+          (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
+               :in $ ?account-id-pred ?asset-pred
+               :where
+               [?e :fill/account-id ?account-id]
+               [(?account-id-pred ?account-id)]
+               [?e :fill/asset ?a]
+               [(?asset-pred ?a)]
+               [?e :fill/id _]]
+              @conn account-id-pred (asset-pred asset)))
+        (mapv enrich-fill))))
+
+(defn query-all-fills
+  ([conn] (query-all-fills conn nil nil))
+  ([conn campaign] (query-all-fills conn campaign nil))
+  ([conn campaign asset]
+   (query-fills-by-account-pred conn (constantly true) campaign asset)))
+
+(defn query-fills [conn {:keys [account-id trader campaign asset] :as opts}]
+  (let [trader-pred (if (contains? opts :trader)
+                      (accounts-view/account-id-pred conn trader)
+                      (constantly true))
+        pred (common/account-filter-pred trader-pred account-id)]
+    (query-fills-by-account-pred conn pred campaign asset)))

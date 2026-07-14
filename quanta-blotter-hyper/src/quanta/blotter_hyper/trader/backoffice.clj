@@ -2,16 +2,19 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.view.common :as common]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.trades :as trades-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
 
-(defn- process-query [db-conn {:keys [table trader]}]
-  (case table
-    :orders (orders-view/query-orders db-conn {:trader trader})
-    :trades (trades-view/query-fills db-conn {:trader trader})
-    :positions (positions-view/query-positions db-conn {:trader trader})
-    []))
+(defn- process-query [db-conn {:keys [table trader campaign asset account]}]
+  (let [account-id (common/parse-account-id account)
+        opts {:trader trader :campaign campaign :asset asset :account-id account-id}]
+    (case table
+      :orders (orders-view/query-orders db-conn opts)
+      :trades (trades-view/query-fills db-conn opts)
+      :positions (positions-view/query-positions db-conn opts)
+      [])))
 
 (defn- process-query-f [db-conn query-f data-a]
   (m/ap
@@ -32,7 +35,10 @@
    [:positions "positions"]])
 
 (defn- backoffice-header [data-a query-a]
-  (let [current-table (or (:table @data-a) :orders)]
+  (let [current-table (or (:table @data-a) :orders)
+        campaign (or (:campaign @query-a) "")
+        asset (or (:asset @query-a) "")
+        account (or (:account @query-a) "")]
     [:header.backoffice-header
      [:h1 "Backoffice"]
      [:select {:data-on:change
@@ -41,7 +47,22 @@
                   (swap! query-a assoc :table t)
                   (swap! data-a assoc :table t)))}
       (for [[kw label] table-options]
-        [:option {:value (name kw) :selected (= kw current-table)} label])]]))
+        [:option {:value (name kw) :selected (= kw current-table)} label])]
+     [:input.backoffice-filter
+      {:type "text"
+       :placeholder "campaign"
+       :value campaign
+       :data-on:input (h/action (swap! query-a assoc :campaign $value))}]
+     [:input.backoffice-filter
+      {:type "text"
+       :placeholder "asset"
+       :value asset
+       :data-on:input (h/action (swap! query-a assoc :asset $value))}]
+     [:input.backoffice-filter
+      {:type "text"
+       :placeholder "account"
+       :value account
+       :data-on:input (h/action (swap! query-a assoc :account $value))}]]))
 
 (defn- render-table [{:keys [table rows]}]
   (case table
@@ -57,12 +78,13 @@
              (let [db (:db env)
                    _ (assert db ":db needs to be in :ctx")
                    data-a (atom nil)
-                   query-a (atom (merge {:table :orders} query-options))
+                   query-a (atom (merge {:table :orders :campaign "" :asset "" :account ""} query-options))
                    query-f (m/watch query-a)
                    this {:data-a data-a
                          :query-a query-a
                          :dispose! (start-query-processor db query-f data-a)}]
                (h/watch! data-a)
+               (h/watch! query-a)
                this))
     :render (fn [{:keys [data-a query-a]} _req]
               [:motion.div.backoffice-page

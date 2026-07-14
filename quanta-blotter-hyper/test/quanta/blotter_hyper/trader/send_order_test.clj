@@ -12,7 +12,7 @@
   (-> demo-accounts-path slurp edn/read-string))
 
 (deftest available-assets-test
-  (is (= ["EURUSD" "USDJPY" "BTCUSDT.LF.BB"]
+  (is (= ["EURUSD" "USDJPY" "BTCUSDT.LF.BB" "__TEST" "__TEST2"]
          (send-order/available-assets))))
 
 (deftest trader-accounts-test

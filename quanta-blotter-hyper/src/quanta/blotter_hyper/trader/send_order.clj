@@ -3,6 +3,7 @@
    [missionary.core :as m]
    [nano-id.core :refer [nano-id]]
    [hyper.core :as h]
+   [quanta.blotter-hyper.component.decimal :refer [decimal-input]]
    [quanta.blotter.oms.core :as oms]
    [quanta.blotter.oms.db :as db]
    [quanta.blotter.oms.validation.schema :as schema]
@@ -14,7 +15,9 @@
   []
   ["EURUSD"
    "USDJPY"
-   "BTCUSDT.LF.BB"])
+   "BTCUSDT.LF.BB"
+   "__TEST"
+   "__TEST2"])
 
 (defn trader-accounts
   "Returns a map of enabled account id to account name for `trader`, e.g.
@@ -229,12 +232,21 @@
                     (update-field :order-type keyword-from-select))
       [:div#send-order-limit-slot
        (when show-limit?
-         (num-field "limit" (:limit state)
-                    (update-field :limit bigdec)))]
+         [:label.send-order-field
+          [:span.send-order-label "limit"]
+          (decimal-input
+           {:value (str (:limit state))
+            :class "small-decimal-editor"
+            :data-on:change
+            (h/action
+             (reset! error-a nil)
+             (swap! state-a assoc :limit (bigdec (:value $detail))))})])]
       (num-field "qty" (:qty state)
                  (update-field :qty bigdec))
-      (text-field "campaign" (:campaign state) identity {:readonly true})
-      (text-field "label" (:label state) identity {:readonly true})
+      (text-field "campaign" (:campaign state)
+                  (update-field :campaign identity))
+      (text-field "label" (select-value-str (:label state))
+                  (update-field :label keyword-from-select))
       [:button.send-order-submit
        {:type "button"
         :data-on:click (h/action (submit! oms state-a error-a))}
