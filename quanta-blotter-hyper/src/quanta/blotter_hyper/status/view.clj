@@ -1,6 +1,5 @@
 (ns quanta.blotter-hyper.status.view
   (:require
-   [hyper.context :as ctx]
    [hyper.core :as h]
    [quanta.blotter-hyper.status.core :as core]
    [tick.core :as t]))
@@ -12,16 +11,22 @@
     (t/format time-fmt (t/in instant t/UTC))))
 
 (defn sse-connection-status
-  "Banner when SSE timestamps stop updating for >2s.
-   Stale detection + auto-reconnect via /js/sse-reconnect.js (loaded here)."
+  "UTC clock + Hyper connection banner.
+   Soft reconnect via h/reconnect when Datastar exhausts retries."
   []
-  (let [tab-id (:hyper/tab-id ctx/*request*)]
-    [:motion.div#sse-connection-status.sse-connection-status
-     (when tab-id {:data-tab-id tab-id})
-     (h/reactive [core/server-time-a]
-                 (let [instant @core/server-time-a]
-                   [:motion.span#sse-server-ts
-                    {:data-server-ts (if instant (.toEpochMilli instant) 0)}
-                    (fmt-server-time instant)]))
-     [:motion.div.sse-interrupted "server connection interrupted"]
-     [:script {:src "/js/sse-reconnect.js" :defer true}]]))
+  [:motion.div#sse-connection-status.sse-connection-status
+   {:data-class (h/expr {:is-stale (not @h/connected?*)})}
+   (h/reactive [core/server-time-a]
+               (let [instant @core/server-time-a]
+                 [:motion.span#sse-server-ts
+                  {:data-server-ts (if instant (.toEpochMilli instant) 0)}
+                  (fmt-server-time instant)]))
+   [:motion.div.sse-interrupted
+    "server connection interrupted"
+    [:button {:type "button"
+              :data-show (h/expr (or (= @h/connection* :error)
+                                     (= @h/connection* :closed)))
+              :data-on:click (h/reconnect)}
+     "Retry"]]
+   ;; Soft reconnect is handled by Hyper; keep script for now:
+   #_[:script {:src "/js/sse-reconnect.js" :defer true}]])

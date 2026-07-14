@@ -68,6 +68,7 @@
                     (clip/ref :routes)
                     :static-resources "public"
                     :head (deref demo.head/head-tags)
+                    :heartbeat-ms 5000
                     :watches [(deref playground.notification.state/notifications*)])}
   :hyper {:start (hyper.core/start!
                   (clip/ref :handler)

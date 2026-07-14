@@ -1051,6 +1051,17 @@ body:has(.live-page) {
   background: #6f1e1e;
 }
 
+.send-order-cancel:disabled {
+  background: #555;
+  border-color: #444;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.send-order-cancel:disabled:hover {
+  background: #555;
+}
+
 .orders-table .send-order-cancel {
   font-size: 0.75rem;
   padding: 0.2rem 0.45rem;

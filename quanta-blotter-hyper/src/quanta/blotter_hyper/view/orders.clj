@@ -2,6 +2,7 @@
   (:require
    [datahike.api :refer [q]]
    [hyper.core :as h]
+   [quanta.blotter.oms.flow.working-orders :as working-orders]
    [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
@@ -28,11 +29,14 @@
    (common/fmt-cell status)])
 
 (defn- cancel-order-cell [order {:keys [oms error-a]}]
-  [:td
-   [:button.send-order-cancel
-    {:type "button"
-     :data-on:click (h/action (send-order/cancel-by-order! oms order error-a))}
-    "Cancel"]])
+  (let [done? (working-orders/order-done? order)]
+    [:td
+     [:button.send-order-cancel
+      (cond-> {:type "button"}
+        done? (assoc :disabled true)
+        (not done?) (assoc :data-on:click
+                           (h/action (send-order/cancel-by-order! oms order error-a))))
+      "Cancel"]]))
 
 (defn orders-table
   ([orders] (orders-table orders nil))
