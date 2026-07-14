@@ -19,4 +19,6 @@
    " · "
    [:a (h/navigate :playground/decimal) "Decimal"]
    " · "
+   [:a (h/navigate :playground/instant) "Instant"]
+   " · "
    [:a {:href "/me"} "User"]])

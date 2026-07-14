@@ -2,14 +2,19 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.component.instant :as instant]
    [quanta.blotter-hyper.view.common :as common]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.trades :as trades-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
 
-(defn- process-query [db-conn {:keys [table trader campaign asset account]}]
+(defn- process-query [db-conn {:keys [table trader campaign asset account start-date]}]
   (let [account-id (common/parse-account-id account)
-        opts {:trader trader :campaign campaign :asset asset :account-id account-id}]
+        opts {:trader trader
+              :campaign campaign
+              :asset asset
+              :account-id account-id
+              :start-date start-date}]
     (case table
       :orders (orders-view/query-orders db-conn opts)
       :trades (trades-view/query-fills db-conn opts)
@@ -62,7 +67,14 @@
       {:type "text"
        :placeholder "account"
        :value account
-       :data-on:input (h/action (swap! query-a assoc :account $value))}]]))
+       :data-on:input (h/action (swap! query-a assoc :account $value))}]
+     (instant/instant-input
+      {:value (:start-date @query-a)
+       :placeholder "start-date"
+       :data-on:change
+       (h/action
+        (swap! query-a assoc :start-date
+               (some-> (:value $detail) instant/truncate-instant)))})]))
 
 (defn- render-table [{:keys [table rows]}]
   (case table
@@ -78,7 +90,12 @@
              (let [db (:db env)
                    _ (assert db ":db needs to be in :ctx")
                    data-a (atom nil)
-                   query-a (atom (merge {:table :orders :campaign "" :asset "" :account ""} query-options))
+                   query-a (atom (merge {:table :orders
+                                         :campaign ""
+                                         :asset ""
+                                         :account ""
+                                         :start-date nil}
+                                        query-options))
                    query-f (m/watch query-a)
                    this {:data-a data-a
                          :query-a query-a

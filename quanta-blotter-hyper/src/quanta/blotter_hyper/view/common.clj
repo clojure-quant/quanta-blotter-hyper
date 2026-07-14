@@ -58,3 +58,13 @@
   (if account-id
     (fn [id] (and (= id account-id) (trader-pred id)))
     trader-pred))
+
+(defn start-date-pred
+  "Datahike predicate: when `start` is non-nil, match instants on/after it;
+  otherwise match any value."
+  [start]
+  (if start
+    (let [start* (t/instant start)]
+      (fn [d]
+        (and (some? d) (not (neg? (compare (t/instant d) start*))))))
+    (constantly true)))

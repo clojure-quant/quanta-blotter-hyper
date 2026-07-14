@@ -56,15 +56,21 @@
   [asset]
   (common/substring-pred asset))
 
+(defn- date-pred
+  [start-date]
+  (common/start-date-pred start-date))
+
 (defn query-fills-by-account-pred
   ([conn account-id-pred]
-   (query-fills-by-account-pred conn account-id-pred nil nil))
+   (query-fills-by-account-pred conn account-id-pred nil nil nil))
   ([conn account-id-pred campaign]
-   (query-fills-by-account-pred conn account-id-pred campaign nil))
+   (query-fills-by-account-pred conn account-id-pred campaign nil nil))
   ([conn account-id-pred campaign asset]
+   (query-fills-by-account-pred conn account-id-pred campaign asset nil))
+  ([conn account-id-pred campaign asset start-date]
    (->> (if (seq campaign)
           (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
-               :in $ ?account-id-pred ?campaign-pred ?asset-pred
+               :in $ ?account-id-pred ?campaign-pred ?asset-pred ?date-pred
                :where
                [?e :fill/account-id ?account-id]
                [(?account-id-pred ?account-id)]
@@ -72,28 +78,33 @@
                [(?campaign-pred ?c)]
                [?e :fill/asset ?a]
                [(?asset-pred ?a)]
+               [?e :fill/date ?d]
+               [(?date-pred ?d)]
                [?e :fill/id _]]
-              @conn account-id-pred (campaign-pred campaign) (asset-pred asset))
+              @conn account-id-pred (campaign-pred campaign) (asset-pred asset) (date-pred start-date))
           (q '[:find [(pull ?e [* {:fill/account-db [:account/name :account/trader]}]) ...]
-               :in $ ?account-id-pred ?asset-pred
+               :in $ ?account-id-pred ?asset-pred ?date-pred
                :where
                [?e :fill/account-id ?account-id]
                [(?account-id-pred ?account-id)]
                [?e :fill/asset ?a]
                [(?asset-pred ?a)]
+               [?e :fill/date ?d]
+               [(?date-pred ?d)]
                [?e :fill/id _]]
-              @conn account-id-pred (asset-pred asset)))
+              @conn account-id-pred (asset-pred asset) (date-pred start-date)))
         (mapv enrich-fill))))
 
 (defn query-all-fills
-  ([conn] (query-all-fills conn nil nil))
-  ([conn campaign] (query-all-fills conn campaign nil))
-  ([conn campaign asset]
-   (query-fills-by-account-pred conn (constantly true) campaign asset)))
+  ([conn] (query-all-fills conn nil nil nil))
+  ([conn campaign] (query-all-fills conn campaign nil nil))
+  ([conn campaign asset] (query-all-fills conn campaign asset nil))
+  ([conn campaign asset start-date]
+   (query-fills-by-account-pred conn (constantly true) campaign asset start-date)))
 
-(defn query-fills [conn {:keys [account-id trader campaign asset] :as opts}]
+(defn query-fills [conn {:keys [account-id trader campaign asset start-date] :as opts}]
   (let [trader-pred (if (contains? opts :trader)
                       (accounts-view/account-id-pred conn trader)
                       (constantly true))
         pred (common/account-filter-pred trader-pred account-id)]
-    (query-fills-by-account-pred conn pred campaign asset)))
+    (query-fills-by-account-pred conn pred campaign asset start-date)))

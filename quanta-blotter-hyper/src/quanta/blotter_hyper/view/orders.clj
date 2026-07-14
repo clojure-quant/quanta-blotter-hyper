@@ -101,15 +101,21 @@
   [asset]
   (common/substring-pred asset))
 
+(defn- date-pred
+  [start-date]
+  (common/start-date-pred start-date))
+
 (defn query-orders-by-account-pred
   ([conn account-id-pred]
-   (query-orders-by-account-pred conn account-id-pred nil nil))
+   (query-orders-by-account-pred conn account-id-pred nil nil nil))
   ([conn account-id-pred campaign]
-   (query-orders-by-account-pred conn account-id-pred campaign nil))
+   (query-orders-by-account-pred conn account-id-pred campaign nil nil))
   ([conn account-id-pred campaign asset]
+   (query-orders-by-account-pred conn account-id-pred campaign asset nil))
+  ([conn account-id-pred campaign asset start-date]
    (->> (if (seq campaign)
           (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
-               :in $ ?account-id-pred ?campaign-pred ?asset-pred
+               :in $ ?account-id-pred ?campaign-pred ?asset-pred ?date-pred
                :where
                [?e :order/account-id ?account-id]
                [(?account-id-pred ?account-id)]
@@ -117,55 +123,66 @@
                [(?campaign-pred ?c)]
                [?e :order/asset ?asset]
                [(?asset-pred ?asset)]
+               [?e :order/date ?d]
+               [(?date-pred ?d)]
                [?e :order/id _]]
-              @conn account-id-pred (campaign-pred campaign) (asset-pred asset))
+              @conn account-id-pred (campaign-pred campaign) (asset-pred asset) (date-pred start-date))
           (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
-               :in $ ?account-id-pred ?asset-pred
+               :in $ ?account-id-pred ?asset-pred ?date-pred
                :where
                [?e :order/account-id ?account-id]
                [(?account-id-pred ?account-id)]
                [?e :order/asset ?asset]
                [(?asset-pred ?asset)]
+               [?e :order/date ?d]
+               [(?date-pred ?d)]
                [?e :order/id _]]
-              @conn account-id-pred (asset-pred asset)))
+              @conn account-id-pred (asset-pred asset) (date-pred start-date)))
         (mapv enrich-order))))
 
 (defn query-all-orders
-  ([conn] (query-all-orders conn nil nil))
-  ([conn campaign] (query-all-orders conn campaign nil))
-  ([conn campaign asset]
-   (query-orders-by-account-pred conn (constantly true) campaign asset)))
+  ([conn] (query-all-orders conn nil nil nil))
+  ([conn campaign] (query-all-orders conn campaign nil nil))
+  ([conn campaign asset] (query-all-orders conn campaign asset nil))
+  ([conn campaign asset start-date]
+   (query-orders-by-account-pred conn (constantly true) campaign asset start-date)))
 
 (defn query-account-orders
   ([conn account-id]
-   (query-account-orders conn account-id nil nil))
+   (query-account-orders conn account-id nil nil nil))
   ([conn account-id campaign]
-   (query-account-orders conn account-id campaign nil))
+   (query-account-orders conn account-id campaign nil nil))
   ([conn account-id campaign asset]
+   (query-account-orders conn account-id campaign asset nil))
+  ([conn account-id campaign asset start-date]
    (->> (if (seq campaign)
           (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
-               :in $ ?account-id ?campaign-pred ?asset-pred
+               :in $ ?account-id ?campaign-pred ?asset-pred ?date-pred
                :where
                [?e :order/account-id ?account-id]
                [?e :order/campaign ?c]
                [(?campaign-pred ?c)]
                [?e :order/asset ?a]
                [(?asset-pred ?a)]
+               [?e :order/date ?d]
+               [(?date-pred ?d)]
                [?e :order/id _]]
-              @conn account-id (campaign-pred campaign) (asset-pred asset))
+              @conn account-id (campaign-pred campaign) (asset-pred asset) (date-pred start-date))
           (q '[:find [(pull ?e [* {:order/account-db [:account/name :account/trader]}]) ...]
-               :in $ ?account-id ?asset-pred
+               :in $ ?account-id ?asset-pred ?date-pred
                :where
                [?e :order/account-id ?account-id]
                [?e :order/asset ?a]
                [(?asset-pred ?a)]
+               [?e :order/date ?d]
+               [(?date-pred ?d)]
                [?e :order/id _]]
-              @conn account-id (asset-pred asset)))
+              @conn account-id (asset-pred asset) (date-pred start-date)))
         (mapv enrich-order))))
 
-(defn query-orders [conn {:keys [account-id trader campaign asset] :as opts}]
+(defn query-orders [conn {:keys [account-id trader campaign asset start-date] :as opts}]
   (let [trader-pred (if (contains? opts :trader)
                       (accounts-view/account-id-pred conn trader)
                       (constantly true))
         pred (common/account-filter-pred trader-pred account-id)]
-    (query-orders-by-account-pred conn pred campaign asset)))
+    (query-orders-by-account-pred conn pred campaign asset start-date)))

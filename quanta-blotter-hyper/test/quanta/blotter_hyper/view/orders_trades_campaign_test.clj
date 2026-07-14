@@ -256,3 +256,49 @@
              (position-assets (positions-view/query-positions conn {:trader nil :account-id 2}))))
       (finally
         (datahike/db-stop conn)))))
+
+(deftest query-minimum-date-filter
+  "Orders (:order/date), trades (:fill/date), and positions (:position/date-open)
+  respect :start-date as an inclusive minimum."
+  (let [conn (fresh-db)
+        state (db/new-state)
+        older (t/instant "2020-01-01T00:00:00Z")
+        at-cutoff (t/instant "2024-01-01T00:00:00Z")
+        newer (t/instant "2024-06-15T12:00:00Z")
+        cutoff at-cutoff]
+    (try
+      (seed-account! conn 1 "florian" "a1")
+      (db/process conn state [:order (assoc (sample-order "o-old" 1 "EURUSD" nil)
+                                            :order/date older)])
+      (db/process conn state [:order (assoc (sample-order "o-cut" 1 "EURUSD" nil)
+                                            :order/date at-cutoff)])
+      (db/process conn state [:order (assoc (sample-order "o-new" 1 "GBPUSD" nil)
+                                            :order/date newer)])
+      (db/process conn state [:fill (assoc (sample-fill "f-old" "o-old" 1 "EURUSD" nil)
+                                           :fill/date older)])
+      (db/process conn state [:fill (assoc (sample-fill "f-cut" "o-cut" 1 "EURUSD" nil)
+                                           :fill/date at-cutoff)])
+      (db/process conn state [:fill (assoc (sample-fill "f-new" "o-new" 1 "GBPUSD" nil)
+                                           :fill/date newer)])
+      (db/process conn state [:position (assoc (sample-position 1 "EURUSD")
+                                               :position/date-open older)])
+      (db/process conn state [:position (assoc (sample-position 1 "USDJPY")
+                                               :position/date-open at-cutoff)])
+      (db/process conn state [:position (assoc (sample-position 1 "GBPUSD")
+                                               :position/date-open newer)])
+      (testing "without minimum-date returns all"
+        (is (= #{"o-old" "o-cut" "o-new"}
+               (order-ids (orders-view/query-orders conn {:trader nil :start-date nil}))))
+        (is (= #{"f-old" "f-cut" "f-new"}
+               (fill-ids (trades-view/query-fills conn {:trader nil}))))
+        (is (= #{"EURUSD" "USDJPY" "GBPUSD"}
+               (position-assets (positions-view/query-positions conn {:trader nil})))))
+      (testing "minimum-date keeps on/after (inclusive)"
+        (is (= #{"o-cut" "o-new"}
+               (order-ids (orders-view/query-orders conn {:trader nil :start-date cutoff}))))
+        (is (= #{"f-cut" "f-new"}
+               (fill-ids (trades-view/query-fills conn {:trader nil :start-date cutoff}))))
+        (is (= #{"USDJPY" "GBPUSD"}
+               (position-assets (positions-view/query-positions conn {:trader nil :start-date cutoff})))))
+      (finally
+        (datahike/db-stop conn)))))

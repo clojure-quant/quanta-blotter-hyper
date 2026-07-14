@@ -4,9 +4,6 @@
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
 
-(defn- fmt-open? [open?]
-  (when open? "Y"))
-
 (defn positions-table
   [positions]
   (let [positions (sort-by :position/date-open #(compare %2 %1) positions)]
@@ -24,12 +21,11 @@
         [:th.num "avg-in"]
         [:th.num "avg-out"]
         [:th.num "pl"]
-        [:th "open?"]
         [:th.num "qty-open"]
         [:th.time "close"]]]
       [:tbody
        (if (empty? positions)
-         [:tr [:td {:colspan 13} "No positions"]]
+         [:tr [:td {:colspan 12} "No positions"]]
          (for [pos positions]
            [:tr {:key (str (:position/account pos) "-"
                             (:position/asset pos) "-"
@@ -44,7 +40,6 @@
             [:td.num (when-let [v (:position/average-entry-price pos)] (str v))]
             [:td.num (when-let [v (:position/avg-exit-price pos)] (str v))]
             [:td.num (when-let [v (:position/realized-pl pos)] (str v))]
-            [:td (fmt-open? (:position/open pos))]
             [:td.num.qty-open (common/fmt-cell (:position/qty-open pos))]
             [:td.time (common/fmt-instant-utc (:position/date-close pos))]]))]]]))
 
@@ -58,28 +53,37 @@
   [asset]
   (common/substring-pred asset))
 
+(defn- date-pred
+  [start-date]
+  (common/start-date-pred start-date))
+
 (defn query-positions-by-account-pred
   ([conn account-id-pred]
-   (query-positions-by-account-pred conn account-id-pred nil))
+   (query-positions-by-account-pred conn account-id-pred nil nil))
   ([conn account-id-pred asset]
+   (query-positions-by-account-pred conn account-id-pred asset nil))
+  ([conn account-id-pred asset start-date]
    (->> (q '[:find [(pull ?e [* {:position/account-db [:account/name :account/trader]}]) ...]
-             :in $ ?account-id-pred ?asset-pred
+             :in $ ?account-id-pred ?asset-pred ?date-pred
              :where
              [?e :position/account ?account-id]
              [(?account-id-pred ?account-id)]
              [?e :position/asset ?a]
-             [(?asset-pred ?a)]]
-          @conn account-id-pred (asset-pred asset))
+             [(?asset-pred ?a)]
+             [?e :position/date-open ?d]
+             [(?date-pred ?d)]]
+          @conn account-id-pred (asset-pred asset) (date-pred start-date))
         (mapv enrich-position))))
 
 (defn query-all-positions
-  ([conn] (query-all-positions conn nil))
-  ([conn asset]
-   (query-positions-by-account-pred conn (constantly true) asset)))
+  ([conn] (query-all-positions conn nil nil))
+  ([conn asset] (query-all-positions conn asset nil))
+  ([conn asset start-date]
+   (query-positions-by-account-pred conn (constantly true) asset start-date)))
 
-(defn query-positions [conn {:keys [account-id trader asset] :as opts}]
+(defn query-positions [conn {:keys [account-id trader asset start-date] :as opts}]
   (let [trader-pred (if (contains? opts :trader)
                       (accounts-view/account-id-pred conn trader)
                       (constantly true))
         pred (common/account-filter-pred trader-pred account-id)]
-    (query-positions-by-account-pred conn pred asset)))
+    (query-positions-by-account-pred conn pred asset start-date)))

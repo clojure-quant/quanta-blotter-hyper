@@ -11,7 +11,8 @@
    [playground.notification.view :refer [notifications-page]]
    [playground.simulator.page :refer [simulator-page]]
    [playground.winbox.page :refer [winbox-page]]
-   [playground.decimal.page :refer [decimal-page]]))
+   [playground.decimal.page :refer [decimal-page]]
+   [playground.instant.page :refer [instant-page]]))
 
 
 (defn playground-home-page
@@ -51,7 +52,10 @@
                 :get #'winbox-page}]
     ["/decimal" {:name :playground/decimal
                  :title "Decimal input"
-                 :get #'decimal-page}]]])
+                 :get #'decimal-page}]
+    ["/instant" {:name :playground/instant
+                 :title "Instant input"
+                 :get #'instant-page}]]])
 
 
 (defn routes [{:keys [token] :as ctx}]
