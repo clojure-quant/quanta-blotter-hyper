@@ -35,6 +35,6 @@
               :interval-sec 30}
 
  :quote-manager {:quote-accounts-file "demo-quote-accounts.edn"
-                 :log-file "log/quotes.txt"
+                 :account-log-dir "log/quote"
                  :ns-require [fix-engine.quote.account
                               quanta.bybit.quote.account]}}

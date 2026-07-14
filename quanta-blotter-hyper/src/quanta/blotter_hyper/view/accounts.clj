@@ -291,6 +291,7 @@
    (if editable?
      (account-name-cell account opts)
      [:td (common/fmt-cell (:account/name account))])
+   [:td (common/fmt-cell (:account/currency account))]
    (if editable?
      (account-balance-cell account opts)
      [:td.num (common/fmt-cell (:account/balance account))])
@@ -331,7 +332,7 @@
                     (juxt :account/trader :account/id)
                     :account/id)
          accounts (sort-by sort-key accounts)
-         cols (if show-trader? 8 7)]
+         cols (if show-trader? 9 8)]
      [:div.orders-table-wrap
       (when editable? (account-settings-dialog dialog-opts))
       [:table.orders-table
@@ -340,6 +341,7 @@
          (when show-trader? [:th "trader"])
          [:th "account id"]
          [:th "account name"]
+         [:th "currency"]
          [:th.num "account balance"]
          [:th "enabled"]
          [:th "api type"]
@@ -361,7 +363,7 @@
 
 (defn query-all-accounts [conn]
   (->> (d/q '[:find [(pull ?e [:db/id :account/id :account/trader :account/name
-                                :account/balance :account/enabled :account/api
+                                :account/currency :account/balance :account/enabled :account/api
                                 :account/settings
                                 {:account/asset-list [:db/id :lists/name]}]) ...]
               :where [?e :account/id _]]
@@ -370,7 +372,7 @@
 
 (defn query-trader-accounts [conn trader]
   (->> (d/q '[:find [(pull ?e [:db/id :account/id :account/trader :account/name
-                                :account/balance :account/enabled :account/api
+                                :account/currency :account/balance :account/enabled :account/api
                                 :account/settings
                                 {:account/asset-list [:db/id :lists/name]}]) ...]
               :in $ ?trader

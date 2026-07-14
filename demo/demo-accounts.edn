@@ -1,6 +1,7 @@
 [{:account/id 1
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper-2fills"
   :account/notes "always fills order with 2 fills; timing is random"
@@ -14,6 +15,7 @@
  {:account/id 2
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "arne"
   :account/name "apaper-1fill"
   :account/notes "always fills 100% of the order; timing is random"
@@ -27,6 +29,7 @@
  {:account/id 3
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "testtrader"
   :account/name "tpaper-1fill-1s"
   :account/notes "always fills 100% of the order after 1 second"
@@ -40,6 +43,7 @@
  {:account/id 4
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper-reject"
   :account/notes "all orders will be rejected"
@@ -53,6 +57,7 @@
  {:account/id 5
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper fast/bad"
   :account/notes "a real world account with an unreliable but fast broker."
@@ -67,6 +72,7 @@
  {:account/id 6
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper corrupt"
   :account/notes "every message will be corrupted"
@@ -81,6 +87,7 @@
  {:account/id 7
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "ant"
   :account/name "apaper never"
   :account/notes "will never fill an order."
@@ -95,6 +102,7 @@
  {:account/id 8
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "arne"
   :account/name "apaper-1fill-1s"
   :account/notes "always fills 100% of the order after 1 second"
@@ -109,6 +117,7 @@
  {:account/id 1000
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "florian"
   :account/name "pepperstone demo1"
   :account/notes "Pepperstone demo SSL"
@@ -129,6 +138,7 @@
  {:account/id 2000
   :account/enabled true
   :account/balance 10000M
+  :account/currency "USD"
   :account/trader "florian"
   :account/name "bybit florian demo1"
   :account/notes "bybit trade testnet"

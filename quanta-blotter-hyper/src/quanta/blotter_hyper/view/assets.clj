@@ -13,6 +13,7 @@
   [[:asset/symbol "symbol"]
    [:asset/name "name"]
    [:asset/exchange "exchange"]
+   [:asset/currency "currency"]
    [:asset/margin "margin"]
    [:asset/price-point "price point"]
    [:asset/quantity-step "quantity step"]
@@ -146,6 +147,7 @@
                           :asset/symbol
                           :asset/name
                           :asset/exchange
+                          :asset/currency
                           :asset/margin
                           :asset/price-point
                           :asset/quantity-step
