@@ -51,7 +51,8 @@
          qm (create-quote-manager {:db db
                                    :quote-accounts-file "demo-quote-accounts.edn"
                                    :account-log-dir "log/quote"
-                                   :ns-require ['fix-engine.quote.account
+                                   :ns-require ['quanta.market-sim.quote-random
+                                                'fix-engine.quote.account
                                                 'quanta.bybit.quote.account]})
          subscription-a (atom (or list "test"))
          mode (if list (str "list-mode" list) "switching-mode")
