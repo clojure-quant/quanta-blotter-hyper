@@ -27,8 +27,8 @@
     (try
       (let [list-ids {"test" (seed-list! conn "test" ["__TEST" "__TEST2"])
                       "spot-fx" (seed-list! conn "spot-fx" ["EURUSD" "USDJPY"])
-                      "crypto" (seed-list! conn "crypto" ["BTCUSDT.S.BB"
-                                                         "BTCUSDT.LF.BB"])}]
+                      "crypto-test" (seed-list! conn "crypto-test" ["BTCUSDT.S.BBT"
+                                                                   "BTCUSDT.LF.BBT"])}]
       (doseq [account edn-accounts]
         (db/create-account conn (select-keys account [:account/id :account/trader :account/api]))
         (db/update-account conn
@@ -56,7 +56,7 @@
                  :account/assets ["EURUSD" "USDJPY"]}
                 {:account/id 2000
                  :account/name "bybit florian demo1"
-                 :account/assets ["BTCUSDT.S.BB" "BTCUSDT.LF.BB"]}]
+                 :account/assets ["BTCUSDT.S.BBT" "BTCUSDT.LF.BBT"]}]
                (send-order/trader-accounts conn "florian")))))
       (finally
         (datahike/db-stop conn)))))

@@ -6,7 +6,9 @@
    [quanta.asset.schema]
    [quanta.asset.seed]
    [quanta.blotter.oms.db]
-   [quanta.quote.core :refer [create-quote-manager create-quotelist-consumer]]))
+   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.quote.core :refer [create-quote-manager create-quotelist-consumer]]
+   [taoensso.timbre :refer [info]]))
 
 (defn quote-printer [mode subscription-a f]
   (m/reduce
@@ -23,19 +25,19 @@
 (defn subscription-changer [subscription-a]
   (m/sp
    (m/? (m/sleep 7000))
-   (println "asset-list-print: subscribing to crypto")
+   (info "asset-list-print: subscribing to crypto")
    (reset! subscription-a "crypto")
 
    (m/? (m/sleep 7000))
-   (println "asset-list-print: subscribing to spot-fx")
+   (info "asset-list-print: subscribing to spot-fx")
    (reset! subscription-a "spot-fx")
 
    (m/? (m/sleep 7000))
-   (println "asset-list-print: subscribing to default (mix of crypto/spot/random)")
+   (info "asset-list-print: subscribing to default (mix of crypto/spot/random)")
    (reset! subscription-a "default")
 
    (m/? (m/sleep 7000))
-   (println "subscription-changer done!")
+   (info "subscription-changer done!")
    nil))
 
 (defn start!
@@ -56,15 +58,13 @@
                                                 'quanta.bybit.quote.account]})
          subscription-a (atom (or list "test"))
          mode (if list (str "list-mode" list) "switching-mode")
-         _ (println "asset-list-print: subscribing to list " @subscription-a)
+         _ (info "asset-list-print: subscribing to list " @subscription-a)
          {:keys [quotelist dispose!]} (create-quotelist-consumer qm subscription-a)
          printer (quote-printer mode subscription-a (m/watch quotelist))
-         dispose-printer (printer #(println "quote-printer done" %)
-                                  #(println "quote-printer CRASH" %))
+         dispose-printer (start-task! printer "quote-printer")
          sub-changer (when-not list (subscription-changer subscription-a))
          dispose-sub-changer (when sub-changer
-                               (sub-changer #(println "sub-changer done: " %)
-                                            #(println "sub-changer CRASH: " %)))]
+                               (start-task! sub-changer "sub-changer"))]
      {:dispose-printer dispose-printer
       :dispose-sub-changer dispose-sub-changer
       :dispose-consumer dispose!})))

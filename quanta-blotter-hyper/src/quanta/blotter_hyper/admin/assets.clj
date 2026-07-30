@@ -2,6 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.missionary :refer [start-task!]]
    [quanta.blotter-hyper.view.assets :as assets-view]))
 
 (defn- process-query [db-conn _query]
@@ -17,8 +18,7 @@
 (defn- start-query-processor [db-conn query-f data-a]
   (let [f (process-query-f db-conn query-f data-a)
         t (m/reduce (fn [_r _v] nil) nil f)]
-    (t #(println "admin assets query processor done" %)
-       #(println "admin assets query processor error" %))))
+    (start-task! t "admin assets query processor")))
 
 (defn assets-page
   [{:keys [hyper/env] :as _req}]

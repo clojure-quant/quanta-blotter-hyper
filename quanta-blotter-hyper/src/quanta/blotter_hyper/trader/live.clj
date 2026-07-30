@@ -2,6 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.missionary :refer [start-task!]]
    [quanta.blotter.oms.server :as oms-server]
    [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.orders :as orders-view]
@@ -26,8 +27,7 @@
 (defn- start-trader-live-processor [trader trading-state-trader data-a]
   (let [f (process-trader-live-f trader trading-state-trader data-a)
         t (m/reduce (fn [_r _v] nil) nil f)]
-    (t #(println "trader live processor done" %)
-       #(println "trader live processor error" %))))
+    (start-task! t "trader live processor")))
 
 (defn select-position-id!
   [order-state-a position-id]

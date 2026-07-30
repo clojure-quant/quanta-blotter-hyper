@@ -1,6 +1,7 @@
 (ns demo.test-order-sender
   (:require
    [missionary.core :as m]
+   [quanta.blotter-hyper.missionary :refer [start-task!]]
    [quanta.blotter.oms.core :refer [send-test-order]]))
 
 (defn start-order-poller
@@ -12,8 +13,7 @@
                 (m/? (send-test-order oms account-id))
                 (m/? (m/sleep (* 1000 interval-sec)))
                 (recur)))]
-    (task #(println "test-order poller done" %)
-          #(println "test-order poller error" %))))
+    (start-task! task "test-order poller")))
 
 (defn stop-order-poller [dispose]
   (when dispose (dispose)))

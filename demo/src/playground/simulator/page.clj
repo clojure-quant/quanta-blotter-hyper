@@ -4,7 +4,8 @@
    [clojure.string :as str]
    [hyper.core :as h]
    [playground.nav :refer [nav]]
-   [playground.simulator.util :as sim-signal]))
+   [playground.simulator.util :as sim-signal]
+   [taoensso.timbre :refer [info]]))
 
 (defn- sig [trade path]
   (h/signal path (sim-signal/field-default trade path)))
@@ -82,7 +83,7 @@
                  [:risk-decision :outcome] @rd-outcome*
                  [:risk-decision :profile-name] @rd-profile-name*
                  [:risk-decision :violations] @rd-violations*})]
-    (println "Received signal:" (pr-str signal))
+    (info "Received signal:" (pr-str signal))
     (reset! triggered* true)
     (future
       (Thread/sleep 5000)

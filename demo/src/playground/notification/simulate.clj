@@ -1,6 +1,7 @@
 (ns playground.notification.simulate
   (:require
-   [missionary.core :as m])
+   [missionary.core :as m]
+   [quanta.blotter-hyper.missionary :refer [start-task!]])
   (:import [java.time Instant]
            [java.time.format DateTimeFormatter]))
 
@@ -82,5 +83,5 @@
   [notifications*]
   (let [flow (notifications-flow notifications*)
         task (m/reduce (fn [_ _] nil) nil flow)
-        dispose! (task (constantly nil) #(prn "notifications sim error:" %))]
+        dispose! (start-task! task "notifications sim")]
     dispose!))

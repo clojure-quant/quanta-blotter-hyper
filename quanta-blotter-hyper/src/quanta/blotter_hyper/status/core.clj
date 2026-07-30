@@ -2,6 +2,7 @@
   "Server instant pushed over SSE (~1 Hz) for connection health checks."
   (:require
    [missionary.core :as m]
+   [quanta.blotter-hyper.missionary :refer [start-task!]]
    [tick.core :as t]))
 
 (def server-time-a (atom nil))
@@ -21,7 +22,7 @@
     (reset! heartbeat-disposer*
             (let [flow (heartbeat-flow)
                   task (m/reduce (fn [_ _] nil) nil flow)]
-              (task (constantly nil) #(prn "sse heartbeat error:" %)))))
+              (start-task! task "sse heartbeat"))))
   :started)
 
 (defn stop!

@@ -2,6 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter-hyper.missionary :refer [start-task!]]
    [quanta.blotter-hyper.view.accounts :as accounts-view]))
 
 (defn- process-query [db-conn _query]
@@ -18,8 +19,7 @@
 (defn- start-query-processor [db-conn query-f data-a]
   (let [f (process-query-f db-conn query-f data-a)
         t (m/reduce (fn [_r _v] nil) nil f)]
-    (t #(println "admin accounts query processor done" %)
-       #(println "admin accounts query processor error" %))))
+    (start-task! t "admin accounts query processor")))
 
 (defn accounts-page
   [{:keys [hyper/env] :as _req}]
