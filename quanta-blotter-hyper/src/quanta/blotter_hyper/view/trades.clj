@@ -18,6 +18,7 @@
         [:th "camp"]
         [:th "lbl"]
         [:th "order-id"]
+        [:th "position-id"]
         [:th "asset"]
         [:th.side-col "D"]
         [:th.num "qty"]
@@ -25,7 +26,7 @@
         [:th "id"]]]
       [:tbody
        (if (empty? fills)
-         [:tr [:td {:colspan 12} "No trades"]]
+         [:tr [:td {:colspan 13} "No trades"]]
          (for [fill fills]
            [:tr {:key (:fill/id fill)}
             [:td.time (common/fmt-instant-utc (:fill/date fill))]
@@ -35,6 +36,7 @@
             [:td (common/fmt-cell (:fill/campaign fill))]
             [:td (common/fmt-cell (:fill/label fill))]
             [:td (common/fmt-cell (:fill/order-id fill))]
+            [:td (common/fmt-cell (:fill/position-id fill))]
             [:td (common/fmt-cell (:fill/asset fill))]
             (common/side-cell (:fill/side fill))
             [:td.num (common/fmt-cell (:fill/qty fill))]

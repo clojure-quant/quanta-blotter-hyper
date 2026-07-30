@@ -1,6 +1,7 @@
 (ns quanta.blotter-hyper.admin.live
   (:require
    [hyper.core :as h]
+   [quanta.blotter.oms.server :as oms-server]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
 
@@ -8,7 +9,7 @@
   [{:keys [hyper/env] :as _req}]
   (h/view
    {:mount (fn []
-             (let [ts (get-in env [:oms-server :trading-state-trader])
+             (let [ts (oms-server/trading-state-trader (:oms-server env))
                    _ (assert ts ":oms-server :trading-state-trader needs to be in :ctx")]
                (h/watch! ts)
                {:trading-state-trader ts}))

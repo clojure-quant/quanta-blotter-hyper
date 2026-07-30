@@ -6,13 +6,16 @@
 
 (defn fmt-instant-utc [v]
   (when v
-    (t/format utc-fmt (t/in (t/instant v) t/UTC))))
+    (t/format utc-fmt (t/in (t/inst v) t/UTC))))
 
 (defn fmt-cell [v]
   (cond
     (nil? v) "—"
     (keyword? v) (name v)
     :else (str v)))
+
+(defn fmt-yes-no [v]
+  (if v "Y" "N"))
 
 (defn pos-num? [n]
   (and (some? n) (pos? (bigdec n))))
@@ -64,7 +67,7 @@
   otherwise match any value."
   [start]
   (if start
-    (let [start* (t/instant start)]
+    (let [start* (t/inst start)]
       (fn [d]
-        (and (some? d) (not (neg? (compare (t/instant d) start*))))))
+        (and (some? d) (not (neg? (compare (t/inst d) start*))))))
     (constantly true)))

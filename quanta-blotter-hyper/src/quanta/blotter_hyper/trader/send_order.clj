@@ -1,7 +1,9 @@
 (ns quanta.blotter-hyper.trader.send-order
   (:require
+   [datahike.api :as d]
    [missionary.core :as m]
    [nano-id.core :refer [nano-id]]
+   [tick.core :as t]
    [hyper.core :as h]
    [quanta.blotter-hyper.component.decimal :refer [decimal-input]]
    [quanta.blotter.oms.core :as oms]
@@ -11,22 +13,47 @@
 
 (def quote-snapshot-timeout-ms 1000)
 
-(defn available-assets
-  []
-  ["EURUSD"
-   "USDJPY"
-   "BTCUSDT.LF.BB"
-   "__TEST"
-   "__TEST2"])
+(defn- account-asset-list
+  [db-conn account]
+  (let [asset-list (:account/asset-list account)
+        eid (if (map? asset-list) (:db/id asset-list) asset-list)]
+    (when eid
+      (d/pull @db-conn
+              '[:lists/name [:lists/asset :limit nil]]
+              eid))))
+
+(defn- ordered-assets
+  [asset-list]
+  (->> (:lists/asset asset-list)
+       (sort-by first)
+       (mapv second)))
 
 (defn trader-accounts
-  "Returns a map of enabled account id to account name for `trader`, e.g.
-  `{1 \"fpaper-2fills\" 1000 \"pepperstone demo1\"}`."
+  "Returns enabled trader accounts with their ordered asset-list symbols."
   [db-conn trader]
   (->> (db/trader-account-list db-conn trader)
        (filter :account/enabled)
        (sort-by :account/id)
-       (into {} (map (juxt :account/id :account/name)))))
+       (mapv (fn [account]
+               {:account/id (:account/id account)
+                :account/name (:account/name account)
+                :account/assets (ordered-assets
+                                 (account-asset-list db-conn account))}))))
+
+(defn assets-for-account
+  [accounts account-id]
+  (or (some (fn [account]
+              (when (= account-id (:account/id account))
+                (:account/assets account)))
+            accounts)
+      []))
+
+(defn select-account-state
+  [state accounts account-id]
+  (let [assets (assets-for-account accounts account-id)
+        current (:asset state)
+        asset (if (some #{current} assets) current (first assets))]
+    (assoc state :account account-id :asset asset)))
 
 (defn new-order-id
   []
@@ -34,13 +61,16 @@
 
 (defn default-state
   ([]
-   (default-state nil))
+   (default-state nil nil))
   ([account-id]
+   (default-state account-id nil))
+  ([account-id asset]
    {:account account-id
     :cancel-account account-id
     :order-id (new-order-id)
     :cancel-order-id ""
-    :asset "EURUSD"
+    :position-id ""
+    :asset asset
     :side :buy
     :order-type :limit
     :limit 1.1035M
@@ -59,12 +89,16 @@
            :qty (:qty state)
            :campaign (:campaign state)
            :label (:label state)}
+    (seq (:position-id state))
+    (assoc :position-id (:position-id state))
     (#{:limit :stop} (:order-type state))
     (assoc :limit (:limit state))))
 
 (defn state->trader-message
   [state]
-  (assoc (state->order-details state) :type :trader/new-order))
+  (assoc (state->order-details state)
+         :type :trader/new-order
+         :date (t/inst)))
 
 (defn validation-error
   [state]
@@ -91,12 +125,22 @@
   [oms state-a error-a]
   (let [state @state-a
         details (state->order-details state)]
-    (if (valid-new-order? state)
+    (if-not (:asset state)
+      (reset! error-a "Selected account has no configured assets.")
+      (if (valid-new-order? state)
       (do
         (reset! error-a nil)
         (m/? (oms/create-order oms details))
         (reset-order-id! state-a))
-      (reset! error-a (validation-error state)))))
+        (reset! error-a (validation-error state))))))
+
+(defn on-account-change!
+  [quote-manager accounts state-a error-a account-id]
+  (let [state (swap! state-a select-account-state accounts account-id)
+        asset (:asset state)]
+    (if asset
+      (on-asset-change! quote-manager state-a error-a asset)
+      (reset! error-a "Selected account has no configured assets."))))
 
 (defn state->cancel-details
   "Maps cancel-order form state to `cancel-order` arguments."
@@ -107,7 +151,9 @@
 
 (defn state->cancel-message
   [state]
-  (assoc (state->cancel-details state) :type :trader/cancel-order))
+  (assoc (state->cancel-details state)
+         :type :trader/cancel-order
+         :date (t/inst)))
 
 (defn cancel-validation-error
   [state]
@@ -198,15 +244,16 @@
             :data-on:input (h/action (on-change $value))}]])
 
 (defn- account-options [accounts]
-  (for [[id name] (sort-by key accounts)]
+  (for [{:account/keys [id name]} accounts]
     [id (str id " " name)]))
 
 (defn panel
   "Reusable send-order panel. Expects `state-a` atom, `error-a` atom, `accounts`
-  map from `trader-accounts`, `assets` from `available-assets`, `oms`, and
-  `quote-manager` for asset-change quote snapshots."
-  [{:keys [state-a error-a accounts assets oms quote-manager]}]
+  data from `trader-accounts`, `oms`, and `quote-manager` for asset-change
+  quote snapshots."
+  [{:keys [state-a error-a accounts oms quote-manager]}]
   (let [state @state-a
+        assets (assets-for-account accounts (:account state))
         order-data (state->order-details state)
         validation-error @error-a
         update-field (fn [k parse]
@@ -219,8 +266,11 @@
      [:div.send-order-form
       (select-field "account" (:account state)
                     (account-options accounts)
-                    (update-field :account #(Long/parseLong ^String %)))
+                    #(on-account-change! quote-manager accounts state-a error-a
+                                         (Long/parseLong ^String %)))
       (text-field "order-id" (:order-id state) identity {:readonly true})
+      (text-field "position-id" (:position-id state)
+                  (update-field :position-id identity))
       (select-field "asset" (:asset state)
                     (map vector assets assets)
                     #(on-asset-change! quote-manager state-a error-a %))
@@ -249,6 +299,7 @@
                   (update-field :label keyword-from-select))
       [:button.send-order-submit
        {:type "button"
+        :disabled (empty? assets)
         :data-on:click (h/action (submit! oms state-a error-a))}
        "Send order"]]
      [:div.send-order-form
@@ -263,6 +314,8 @@
        "Cancel order"]]
      (when validation-error
        [:div.send-order-error
-        [:p "cannot send order, schema validation error"]
+        [:p (if (string? validation-error)
+              validation-error
+              "cannot send order, schema validation error")]
         [:pre (pr-str validation-error)]])
      [:pre.send-order-preview (pr-str order-data)]]))

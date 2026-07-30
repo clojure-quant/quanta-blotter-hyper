@@ -5,7 +5,7 @@ Web Frontend for quanta-blotter
 ## Requirements
 
 - JDK **21+** (Hyper uses virtual threads)
-  check with `java --version` (we have 25)
+  check with `java --version`
 - Clojure CLI
 
 ## Run

@@ -10,7 +10,7 @@
   (if (nil? v) "nil" (str v)))
 
 (defn- on-instant-change
-  "Parse client ISO emission to Instant or nil."
+  "Parse client ISO emission to Date or nil."
   [state* k]
   (h/action
    (swap! state* assoc k (some-> (:value $detail) instant/truncate-instant))))
@@ -30,13 +30,13 @@
 
 (defn instant-page
   [_req]
-  ;; One map cursor so Instant keys can be nil without tab-cursor's
+  ;; One map cursor so Date keys can be nil without tab-cursor's
   ;; (cas nil default) re-initializing them on every render.
   (let [state* (h/tab-cursor :instant-page
-                             {:now (instant/truncate-instant (t/instant))
+                             {:now (instant/truncate-instant (t/inst))
                               :nil nil
                               :fixed (instant/truncate-instant "2020-05-27T18:07:07Z")
-                              :menu (instant/truncate-instant (t/instant))})]
+                              :menu (instant/truncate-instant (t/inst))})]
     [:motion.div.instant-page
      (nav)
      [:h1 "Instant input (UTC)"]

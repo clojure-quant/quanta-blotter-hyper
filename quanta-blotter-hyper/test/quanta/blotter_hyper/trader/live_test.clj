@@ -21,3 +21,8 @@
     (let [[filtered] (into [] (#'live/filter-for-trader "ant") [sample-state])]
       (is (= [] (:open-positions filtered)))
       (is (= [] (:working-orders filtered))))))
+
+(deftest select-position-id-test
+  (let [order-state-a (atom {:position-id ""})]
+    (live/select-position-id! order-state-a "position-42")
+    (is (= "position-42" (:position-id @order-state-a)))))

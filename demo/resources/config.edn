@@ -24,13 +24,17 @@
  :oms-server {:ns-require [fix-engine.blotter.account
                            quanta.bybit.blotter.account
                            quanta.market-sim.broker-paper]
-              :log-file "log/oms-server-trace.txt"
               :transaction-log-file "log/oms-server-transaction.txt"
               :account-log-dir "log/oms-account"
               :validate? true
               :tag? true
-              :trading-state-log-file "log/oms-server-trading-state.txt"
-              :trading-state-print-interval-ms 15000}
+              :db-enabled true
+              :web-ui {:calculate-enabled true
+                       :history-recent-ms 60000}
+              :calculate-trading-state-trader true
+              :text-logger {:print-enabled false
+                            :log-file "log/oms-server-trading-state.txt"
+                            :interval-ms 15000}}
 
  :test-order {:account-id 3
               :interval-sec 30}

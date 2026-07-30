@@ -1,0 +1,9 @@
+{:lists/name "crypto-test"
+ :lists/asset ["BTCUSDT.S.BBT"
+               "ETHUSDT.S.BBT"
+               "BTCUSDT.LF.BBT"
+               "ETHUSDT.LF.BBT"
+               "SOLUSDT.S.BBT"
+               "XRPUSDT.S.BBT"
+               "SOLUSDT.LF.BBT"
+               "XRPUSDT.LF.BBT"]}

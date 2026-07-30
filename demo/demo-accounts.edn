@@ -5,84 +5,85 @@
   :account/trader "florian"
   :account/name "fpaper-2fills"
   :account/notes "always fills order with 2 fills; timing is random"
-  :account/api :paper
   :account/asset-list "test"
+  :account/api :paper
+  ; this account is used for stress testing. do not change the settings.
   :account/settings {:reject-probability 0
                      :bad-orderupdate-probability 0
-                     :fill-probability 20
+                     :fill-probability 100
                      :fill-qty-prct [50 50]
-                     :wait-seconds 5}}
+                     :ms-between-fills 100}}
  {:account/id 2
   :account/enabled true
   :account/balance 10000M
   :account/currency "USD"
-  :account/trader "arne"
-  :account/name "apaper-1fill"
-  :account/notes "always fills 100% of the order; timing is random"
-  :account/api :paper
+  :account/trader "florian"
+  :account/name "fpaper-1fill-fast"
+  :account/notes "very fast paper broker; always fills 100% of the order"
   :account/asset-list "test"
-  :account/settings {:reject-probability 0
-                     :bad-orderupdate-probability 0
-                     :fill-probability 10
-                     :fill-qty-prct [100]
-                     :wait-seconds 5}}
- {:account/id 3
-  :account/enabled true
-  :account/balance 10000M
-  :account/currency "USD"
-  :account/trader "testtrader"
-  :account/name "tpaper-1fill-1s"
-  :account/notes "always fills 100% of the order after 1 second"
   :account/api :paper
-  :account/asset-list "test"
   :account/settings {:reject-probability 0
                      :bad-orderupdate-probability 0
                      :fill-probability 100
                      :fill-qty-prct [100]
-                     :wait-seconds 1}}
+                     :ms-between-fills 5}}
+ {:account/id 3
+  :account/enabled true
+  :account/balance 10000M
+  :account/currency "USD"
+  :account/trader "arne"
+  :account/name "apaper-1fill-1s"
+  :account/notes "always fills 100% of the order after 1 second"
+  :account/asset-list "test"
+  :account/api :paper
+  :account/settings {:reject-probability 0
+                     :bad-orderupdate-probability 0
+                     :fill-probability 100
+                     :fill-qty-prct [100]
+                     :ms-between-fills 1000}}
  {:account/id 4
-  :account/enabled false
+  :account/enabled true
   :account/balance 10000M
   :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper-reject"
   :account/notes "all orders will be rejected"
-  :account/api :paper
   :account/asset-list "test"
+  :account/api :paper
   :account/settings {:reject-probability 100
                      :bad-orderupdate-probability 0
                      :fill-probability 100
                      :fill-qty-prct [100]
-                     :wait-seconds 1}}
+                     :ms-between-fills 1000}}
  {:account/id 5
-  :account/enabled false
+  :account/enabled true
   :account/balance 10000M
   :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper fast/bad"
   :account/notes "a real world account with an unreliable but fast broker."
-  :account/api :paper
   :account/asset-list "test"
+  :account/api :paper
   :account/settings {:reject-probability 20
                      :bad-orderupdate-probability 10
                      :fill-probability 20
                      :fill-qty-prct [25 25 50]
-                     :wait-seconds 1}}
+                     :ms-between-fills 1000}}
 
  {:account/id 6
-  :account/enabled false
+  :account/enabled true
   :account/balance 10000M
   :account/currency "USD"
   :account/trader "florian"
   :account/name "fpaper corrupt"
   :account/notes "every message will be corrupted"
-  :account/api :paper
   :account/asset-list "test"
+  :account/api :paper
   :account/settings {:reject-probability 1
                      :bad-orderupdate-probability 100
                      :fill-probability 100
                      :fill-qty-prct [100]
-                     :wait-seconds 1}}
+                     :ms-between-fills 1000}}
 
  {:account/id 7
   :account/enabled true
@@ -91,28 +92,13 @@
   :account/trader "ant"
   :account/name "apaper never"
   :account/notes "will never fill an order."
-  :account/api :paper
   :account/asset-list "test"
+  :account/api :paper
   :account/settings {:reject-probability 0
                      :bad-orderupdate-probability 0
                      :fill-probability 0
                      :fill-qty-prct [100]
-                     :wait-seconds 60}}
-
- {:account/id 8
-  :account/enabled true
-  :account/balance 10000M
-  :account/currency "USD"
-  :account/trader "arne"
-  :account/name "apaper-1fill-1s"
-  :account/notes "always fills 100% of the order after 1 second"
-  :account/api :paper
-  :account/asset-list "test"
-  :account/settings {:reject-probability 0
-                     :bad-orderupdate-probability 0
-                     :fill-probability 100
-                     :fill-qty-prct [100]
-                     :wait-seconds 1}}
+                     :ms-between-fills 60000}}
 
  {:account/id 1000
   :account/enabled true
@@ -121,8 +107,8 @@
   :account/trader "florian"
   :account/name "pepperstone demo1"
   :account/notes "Pepperstone demo SSL"
-  :account/api :fix-trade
   :account/asset-list "spot-fx"
+  :account/api :fix-trade
   :account/settings {:spec "fix-specs/ctrader.edn"
                      :header {:begin-string "FIX.4.4"
                               :target-comp-id "CSERVER"
@@ -134,7 +120,6 @@
                            :ssl true}
                      :login {:username "5292473"
                              :password "Regenschirm13!"}}}
-
  {:account/id 2000
   :account/enabled true
   :account/balance 10000M
@@ -143,7 +128,7 @@
   :account/name "bybit florian demo1"
   :account/notes "bybit trade testnet"
   :account/api :bybit-trade
-  :account/asset-list "crypto"
+  :account/asset-list "crypto-test"
   :account/settings {:connection {:mode :test}
                      :login {:api-key "CtOKK6YezfVvOGmc0f"
                              :api-secret "7HLHsB6f7XGbGPP42gunCVklQSIslaLgdur5"}}}]

@@ -1,12 +1,25 @@
 (ns quanta.blotter-hyper.view.positions
   (:require
    [datahike.api :refer [q]]
+   [hyper.core :as h]
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
 
+(defn- position-id-cell
+  [position-id on-position-id-click]
+  [:td
+   (if (and position-id on-position-id-click)
+     [:button.position-id-btn
+      {:type "button"
+       :data-on:click (h/action (on-position-id-click position-id))}
+      (common/fmt-cell position-id)]
+     (common/fmt-cell position-id))])
+
 (defn positions-table
-  [positions]
-  (let [positions (sort-by :position/date-open #(compare %2 %1) positions)]
+  ([positions]
+   (positions-table positions {}))
+  ([positions {:keys [on-position-id-click]}]
+   (let [positions (sort-by :position/date-open #(compare %2 %1) positions)]
     [:div.orders-table-wrap
      [:table.orders-table
       [:thead
@@ -15,9 +28,11 @@
         [:th "trader"]
         [:th "acct"]
         [:th "acct name"]
+        [:th "position-id"]
+        [:th "hedge"]
         [:th "asset"]
         [:th.side-col "D"]
-        [:th.num "qty"]
+        [:th.num "qty-in"]
         [:th.num "avg-in"]
         [:th.num "avg-out"]
         [:th.num "pl"]
@@ -25,23 +40,26 @@
         [:th.time "close"]]]
       [:tbody
        (if (empty? positions)
-         [:tr [:td {:colspan 12} "No positions"]]
+         [:tr [:td {:colspan 14} "No positions"]]
          (for [pos positions]
-           [:tr {:key (str (:position/account pos) "-"
-                            (:position/asset pos) "-"
-                            (name (or (:position/side pos) :none)))}
+           [:tr {:key (or (:position/position-id pos)
+                          (str (:position/account pos) "-"
+                               (:position/asset pos) "-"
+                               (name (or (:position/side pos) :none))))}
             [:td.time (common/fmt-instant-utc (:position/date-open pos))]
             [:td (common/fmt-cell (:position/trader pos))]
             [:td (common/fmt-cell (:position/account pos))]
             [:td (common/fmt-cell (:position/account-name pos))]
+            (position-id-cell (:position/position-id pos) on-position-id-click)
+            [:td (common/fmt-yes-no (:position/hedge pos))]
             [:td (common/fmt-cell (:position/asset pos))]
             (common/side-cell (:position/side pos))
-            [:td.num (common/fmt-cell (:position/qty pos))]
+            [:td.num (common/fmt-cell (:position/qty-entry pos))]
             [:td.num (when-let [v (:position/average-entry-price pos)] (str v))]
             [:td.num (when-let [v (:position/avg-exit-price pos)] (str v))]
             [:td.num (when-let [v (:position/realized-pl pos)] (str v))]
             [:td.num.qty-open (common/fmt-cell (:position/qty-open pos))]
-            [:td.time (common/fmt-instant-utc (:position/date-close pos))]]))]]]))
+            [:td.time (common/fmt-instant-utc (:position/date-close pos))]]))]]])))
 
 (defn- enrich-position [position]
   (common/enrich-account-fields position

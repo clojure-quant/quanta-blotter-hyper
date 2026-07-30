@@ -4,18 +4,18 @@
    [hyper.core :as h]
    [tick.core :as t])
   (:import
-   (java.time Instant)
-   (java.time.temporal ChronoUnit)))
+   (java.util Date)))
 
 (defn truncate-instant
-  "Instant truncated to whole seconds."
-  ^Instant [i]
-  (.truncatedTo (t/instant i) ChronoUnit/SECONDS))
+  "Date truncated to whole seconds."
+  ^Date [i]
+  (let [date (t/inst i)]
+    (Date. (* 1000 (quot (.getTime date) 1000)))))
 
 (defn format-instant-seconds
   "ISO-8601 UTC string truncated to whole seconds (no fractional part)."
   [i]
-  (str (truncate-instant i)))
+  (str (.toInstant (truncate-instant i))))
 
 (h/defc instant-input
   "UTC instant editor with view/edit modes.
@@ -25,10 +25,10 @@
   Click the text → edit mode: grey chrome with date + time + × (no gaps).
   Pointer leaving the grey chrome returns to view mode.
 
-  `:value` is a java.time.Instant (or tick instant), or nil.
+  `:value` is a java.util.Date (or a tick-coercible value), or nil.
   `:placeholder` is the empty-state hint (default \"nil\").
   Emits `change` with `{:value <iso-string-or-nil>}` (ISO seconds UTC);
-  convert with `tick.core/instant` / `truncate-instant` on the server.
+  convert with `tick.core/inst` / `truncate-instant` on the server.
 
   Lifecycle forms are Squinting client code — use only JS (no JVM/tick)."
   [{:keys [value placeholder]}]
@@ -174,7 +174,7 @@
       (when-not (.-editing ctx)
         (apply-iso! value)))))
 
-;; Instant cannot cross the HTML attribute boundary. Coerce Instant/nil →
+;; Date cannot cross the HTML attribute boundary. Coerce Date/nil →
 ;; seconds ISO / nil so the client always sees a plain string (or absent).
 (def instant-input
   (let [raw instant-input]
@@ -189,18 +189,18 @@
 ;;; Relative UTC presets (computed at apply time on the server)
 
 (defn yesterday-midnight-utc
-  ^Instant []
-  (let [today-utc (-> (t/instant) (t/in t/UTC) t/date)
+  ^Date []
+  (let [today-utc (-> (t/inst) (t/in t/UTC) t/date)
         yday (t/<< today-utc (t/new-period 1 :days))]
-    (truncate-instant (t/instant (t/in (t/at yday (t/new-time 0 0 0)) t/UTC)))))
+    (truncate-instant (t/inst (t/in (t/at yday (t/new-time 0 0 0)) t/UTC)))))
 
 (defn yesterday-same-time-utc
-  ^Instant []
-  (truncate-instant (t/<< (t/instant) (t/new-duration 1 :days))))
+  ^Date []
+  (truncate-instant (t/<< (t/inst) (t/new-duration 1 :days))))
 
 (defn seven-days-ago-utc
-  ^Instant []
-  (truncate-instant (t/<< (t/instant) (t/new-duration 7 :days))))
+  ^Date []
+  (truncate-instant (t/<< (t/inst) (t/new-duration 7 :days))))
 
 (def preset-options
   [["yesterday-midnight" "yesterday midnight"]
@@ -208,7 +208,7 @@
    ["7-days-ago" "7 days ago"]])
 
 (defn apply-preset
-  ^Instant [key]
+  ^Date [key]
   (case key
     "yesterday-midnight" (yesterday-midnight-utc)
     "yesterday-same" (yesterday-same-time-utc)
@@ -219,13 +219,13 @@
 ;;; Shortcut UI wrapper (compose instant-input)
 
 (defn- cursor->instant
-  "Return Instant or nil. Treat legacy \"\" cleared sentinel as nil."
+  "Return Date or nil. Treat legacy \"\" cleared sentinel as nil."
   [v]
   (when (and (some? v) (not= "" v))
     (truncate-instant v)))
 
 (defn- change->instant
-  "Client emits ISO string or nil → Instant or nil."
+  "Client emits ISO string or nil → Date or nil."
   [detail]
   (some-> (:value detail) truncate-instant))
 
@@ -239,7 +239,7 @@
 
 (defn instant-with-menu
   "Presets details/summary menu + instant-input bound to `(get @state* k)`.
-  `state*` holds a map; `k` is Instant or nil."
+  `state*` holds a map; `k` is Date or nil."
   [state* k & [opts]]
   [:div.instant-with-menu
    [:details.instant-preset-menu

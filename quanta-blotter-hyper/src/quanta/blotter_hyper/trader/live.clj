@@ -2,6 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
+   [quanta.blotter.oms.server :as oms-server]
    [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.orders :as orders-view]
    [quanta.blotter-hyper.view.positions :as positions-view]))
@@ -28,6 +29,10 @@
     (t #(println "trader live processor done" %)
        #(println "trader live processor error" %))))
 
+(defn select-position-id!
+  [order-state-a position-id]
+  (swap! order-state-a assoc :position-id position-id))
+
 (defn live-page
   [{:keys [hyper/env] :as _req}]
   (h/view
@@ -38,20 +43,20 @@
                    _ (assert db ":db needs to be in :ctx")
                    _ (assert oms ":oms-server :oms needs to be in :ctx")
                    _ (assert quote-manager ":quote-manager needs to be in :ctx")
-                   ts (get-in env [:oms-server :trading-state-trader])
+                   ts (oms-server/trading-state-trader (:oms-server env))
                    _ (assert ts ":oms-server :trading-state-trader needs to be in :ctx")
                    identity @(h/session-cursor :identity)
                    trader (name (:user identity))
                    accounts (send-order/trader-accounts db trader)
-                   first-account (ffirst accounts)
+                   first-account (:account/id (first accounts))
+                   first-asset (first (send-order/assets-for-account accounts first-account))
                    data-a (atom nil)
-                   order-state-a (atom (send-order/default-state first-account))
+                   order-state-a (atom (send-order/default-state first-account first-asset))
                    order-error-a (atom nil)
                    this {:data-a data-a
                          :order-state-a order-state-a
                          :order-error-a order-error-a
                          :accounts accounts
-                         :assets (send-order/available-assets)
                          :oms oms
                          :quote-manager quote-manager
                          :trader trader
@@ -60,7 +65,7 @@
                (h/watch! order-state-a)
                (h/watch! order-error-a)
                this))
-    :render (fn [{:keys [data-a order-state-a order-error-a accounts assets oms quote-manager]} _req]
+    :render (fn [{:keys [data-a order-state-a order-error-a accounts oms quote-manager]} _req]
               (let [{:keys [open-positions working-orders]}
                     (or @data-a {:open-positions [] :working-orders []})]
                 [:motion.div.live-page
@@ -72,7 +77,11 @@
                    [:div.live-columns
                     [:section.live-column
                      [:h2 "Open positions"]
-                     (positions-view/positions-table open-positions)]
+                     (positions-view/positions-table
+                      open-positions
+                      {:on-position-id-click
+                       (fn [position-id]
+                         (select-position-id! order-state-a position-id))})]
                     [:section.live-column
                      [:h2 "Working orders"]
                      (orders-view/orders-table working-orders
@@ -81,7 +90,6 @@
                   (send-order/panel {:state-a order-state-a
                                      :error-a order-error-a
                                      :accounts accounts
-                                     :assets assets
                                      :oms oms
                                      :quote-manager quote-manager})]]))
     :unmount (fn [{:keys [dispose!]}]

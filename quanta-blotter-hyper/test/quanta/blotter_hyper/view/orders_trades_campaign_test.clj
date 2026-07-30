@@ -1,5 +1,6 @@
 (ns quanta.blotter-hyper.view.orders-trades-campaign-test
   (:require
+   [clojure.string :as str]
    [clojure.test :refer [deftest is testing]]
    [tick.core :as t]
    [quanta.blotter.oms.db :as db]
@@ -21,7 +22,7 @@
                            :account/name name})
   (db/enable-account conn account-id true))
 
-(def ^:private now (t/instant))
+(def ^:private now (t/inst))
 
 (defn- sample-order
   [id account-id asset campaign]
@@ -37,6 +38,7 @@
            :order/avg-price nil
            :order/date now
            :order/history []
+           :order/position-id (str "p-" id)
            :order/label :manual}
     campaign (assoc :order/campaign campaign)))
 
@@ -50,6 +52,7 @@
            :fill/qty 1.0M
            :fill/price 1.1M
            :fill/date now
+           :fill/position-id (str "p-" order-id)
            :fill/label :manual}
     campaign (assoc :fill/campaign campaign)))
 
@@ -58,9 +61,11 @@
   {:position/account account-id
    :position/asset asset
    :position/side :long
-   :position/open true
+   :position/position-id (str account-id "-" asset)
+   :position/hedge false
+   :position/qty-entry 1.0M
+   :position/qty-exit 0.0M
    :position/qty-open 1.0M
-   :position/qty 1.0M
    :position/average-entry-price 1.1M
    :position/realized-pl 0.0M
    :position/avg-exit-price nil
@@ -80,9 +85,9 @@
         state (db/new-state)]
     (try
       (seed-account! conn 1 "florian" "a1")
-      (db/process conn state [:order (sample-order "o1" 1 "EURUSD" "fx-q2")])
-      (db/process conn state [:order (sample-order "o2" 1 "EURUSD" "scalp")])
-      (db/process conn state [:order (sample-order "o3" 1 "EURUSD" nil)])
+      (db/persist-block conn state [:order (sample-order "o1" 1 "EURUSD" "fx-q2")])
+      (db/persist-block conn state [:order (sample-order "o2" 1 "EURUSD" "scalp")])
+      (db/persist-block conn state [:order (sample-order "o3" 1 "EURUSD" nil)])
       (testing "without campaign returns all orders"
         (is (= #{"o1" "o2" "o3"}
                (order-ids (orders-view/query-orders conn {:trader nil}))))
@@ -111,9 +116,9 @@
         state (db/new-state)]
     (try
       (seed-account! conn 1 "florian" "a1")
-      (db/process conn state [:fill (sample-fill "f1" "o1" 1 "EURUSD" "fx-q2")])
-      (db/process conn state [:fill (sample-fill "f2" "o2" 1 "EURUSD" "scalp")])
-      (db/process conn state [:fill (sample-fill "f3" "o3" 1 "EURUSD" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f1" "o1" 1 "EURUSD" "fx-q2")])
+      (db/persist-block conn state [:fill (sample-fill "f2" "o2" 1 "EURUSD" "scalp")])
+      (db/persist-block conn state [:fill (sample-fill "f3" "o3" 1 "EURUSD" nil)])
       (testing "without campaign returns all fills"
         (is (= #{"f1" "f2" "f3"}
                (fill-ids (trades-view/query-fills conn {:trader nil}))))
@@ -142,10 +147,10 @@
         state (db/new-state)]
     (try
       (seed-account! conn 1 "florian" "a1")
-      (db/process conn state [:order (sample-order "o1" 1 "EURUSD" nil)])
-      (db/process conn state [:order (sample-order "o2" 1 "EURJPY" nil)])
-      (db/process conn state [:order (sample-order "o3" 1 "NZDEUR" nil)])
-      (db/process conn state [:order (sample-order "o4" 1 "USDJPY" nil)])
+      (db/persist-block conn state [:order (sample-order "o1" 1 "EURUSD" nil)])
+      (db/persist-block conn state [:order (sample-order "o2" 1 "EURJPY" nil)])
+      (db/persist-block conn state [:order (sample-order "o3" 1 "NZDEUR" nil)])
+      (db/persist-block conn state [:order (sample-order "o4" 1 "USDJPY" nil)])
       (testing "without asset returns all"
         (is (= #{"o1" "o2" "o3" "o4"}
                (order-ids (orders-view/query-orders conn {:trader nil :asset ""})))))
@@ -164,10 +169,10 @@
         state (db/new-state)]
     (try
       (seed-account! conn 1 "florian" "a1")
-      (db/process conn state [:fill (sample-fill "f1" "o1" 1 "EURUSD" nil)])
-      (db/process conn state [:fill (sample-fill "f2" "o2" 1 "EURJPY" nil)])
-      (db/process conn state [:fill (sample-fill "f3" "o3" 1 "NZDEUR" nil)])
-      (db/process conn state [:fill (sample-fill "f4" "o4" 1 "USDJPY" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f1" "o1" 1 "EURUSD" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f2" "o2" 1 "EURJPY" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f3" "o3" 1 "NZDEUR" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f4" "o4" 1 "USDJPY" nil)])
       (testing "without asset returns all"
         (is (= #{"f1" "f2" "f3" "f4"}
                (fill-ids (trades-view/query-fills conn {:trader nil :asset ""})))))
@@ -184,10 +189,10 @@
         state (db/new-state)]
     (try
       (seed-account! conn 1 "florian" "a1")
-      (db/process conn state [:position (sample-position 1 "EURUSD")])
-      (db/process conn state [:position (sample-position 1 "EURJPY")])
-      (db/process conn state [:position (sample-position 1 "NZDEUR")])
-      (db/process conn state [:position (sample-position 1 "USDJPY")])
+      (db/persist-block conn state [:position (sample-position 1 "EURUSD")])
+      (db/persist-block conn state [:position (sample-position 1 "EURJPY")])
+      (db/persist-block conn state [:position (sample-position 1 "NZDEUR")])
+      (db/persist-block conn state [:position (sample-position 1 "USDJPY")])
       (testing "without asset returns all"
         (is (= #{"EURUSD" "EURJPY" "NZDEUR" "USDJPY"}
                (position-assets (positions-view/query-positions conn {:trader nil :asset ""})))))
@@ -212,8 +217,8 @@
     (try
       (seed-account! conn 1 "florian" "a1")
       (seed-account! conn 2 "florian" "a2")
-      (db/process conn state [:order (sample-order "o1" 1 "EURUSD" nil)])
-      (db/process conn state [:order (sample-order "o2" 2 "EURUSD" nil)])
+      (db/persist-block conn state [:order (sample-order "o1" 1 "EURUSD" nil)])
+      (db/persist-block conn state [:order (sample-order "o2" 2 "EURUSD" nil)])
       (testing "without account-id returns all"
         (is (= #{"o1" "o2"}
                (order-ids (orders-view/query-orders conn {:trader nil})))))
@@ -233,8 +238,8 @@
     (try
       (seed-account! conn 1 "florian" "a1")
       (seed-account! conn 2 "florian" "a2")
-      (db/process conn state [:fill (sample-fill "f1" "o1" 1 "EURUSD" nil)])
-      (db/process conn state [:fill (sample-fill "f2" "o2" 2 "EURUSD" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f1" "o1" 1 "EURUSD" nil)])
+      (db/persist-block conn state [:fill (sample-fill "f2" "o2" 2 "EURUSD" nil)])
       (is (= #{"f1"}
              (fill-ids (trades-view/query-fills conn {:trader nil :account-id 1}))))
       (is (= #{"f2"}
@@ -248,8 +253,8 @@
     (try
       (seed-account! conn 1 "florian" "a1")
       (seed-account! conn 2 "florian" "a2")
-      (db/process conn state [:position (sample-position 1 "EURUSD")])
-      (db/process conn state [:position (sample-position 2 "USDJPY")])
+      (db/persist-block conn state [:position (sample-position 1 "EURUSD")])
+      (db/persist-block conn state [:position (sample-position 2 "USDJPY")])
       (is (= #{"EURUSD"}
              (position-assets (positions-view/query-positions conn {:trader nil :account-id 1}))))
       (is (= #{"USDJPY"}
@@ -262,29 +267,29 @@
   respect :start-date as an inclusive minimum."
   (let [conn (fresh-db)
         state (db/new-state)
-        older (t/instant "2020-01-01T00:00:00Z")
-        at-cutoff (t/instant "2024-01-01T00:00:00Z")
-        newer (t/instant "2024-06-15T12:00:00Z")
+        older (t/inst "2020-01-01T00:00:00Z")
+        at-cutoff (t/inst "2024-01-01T00:00:00Z")
+        newer (t/inst "2024-06-15T12:00:00Z")
         cutoff at-cutoff]
     (try
       (seed-account! conn 1 "florian" "a1")
-      (db/process conn state [:order (assoc (sample-order "o-old" 1 "EURUSD" nil)
+      (db/persist-block conn state [:order (assoc (sample-order "o-old" 1 "EURUSD" nil)
                                             :order/date older)])
-      (db/process conn state [:order (assoc (sample-order "o-cut" 1 "EURUSD" nil)
+      (db/persist-block conn state [:order (assoc (sample-order "o-cut" 1 "EURUSD" nil)
                                             :order/date at-cutoff)])
-      (db/process conn state [:order (assoc (sample-order "o-new" 1 "GBPUSD" nil)
+      (db/persist-block conn state [:order (assoc (sample-order "o-new" 1 "GBPUSD" nil)
                                             :order/date newer)])
-      (db/process conn state [:fill (assoc (sample-fill "f-old" "o-old" 1 "EURUSD" nil)
+      (db/persist-block conn state [:fill (assoc (sample-fill "f-old" "o-old" 1 "EURUSD" nil)
                                            :fill/date older)])
-      (db/process conn state [:fill (assoc (sample-fill "f-cut" "o-cut" 1 "EURUSD" nil)
+      (db/persist-block conn state [:fill (assoc (sample-fill "f-cut" "o-cut" 1 "EURUSD" nil)
                                            :fill/date at-cutoff)])
-      (db/process conn state [:fill (assoc (sample-fill "f-new" "o-new" 1 "GBPUSD" nil)
+      (db/persist-block conn state [:fill (assoc (sample-fill "f-new" "o-new" 1 "GBPUSD" nil)
                                            :fill/date newer)])
-      (db/process conn state [:position (assoc (sample-position 1 "EURUSD")
+      (db/persist-block conn state [:position (assoc (sample-position 1 "EURUSD")
                                                :position/date-open older)])
-      (db/process conn state [:position (assoc (sample-position 1 "USDJPY")
+      (db/persist-block conn state [:position (assoc (sample-position 1 "USDJPY")
                                                :position/date-open at-cutoff)])
-      (db/process conn state [:position (assoc (sample-position 1 "GBPUSD")
+      (db/persist-block conn state [:position (assoc (sample-position 1 "GBPUSD")
                                                :position/date-open newer)])
       (testing "without minimum-date returns all"
         (is (= #{"o-old" "o-cut" "o-new"}
@@ -302,3 +307,19 @@
                (position-assets (positions-view/query-positions conn {:trader nil :start-date cutoff})))))
       (finally
         (datahike/db-stop conn)))))
+
+(deftest position-fields-render-test
+  (let [position (assoc (sample-position 1 "EURUSD") :position/hedge true)
+        html (pr-str (positions-view/positions-table [position]))]
+    (is (str/includes? html "position-id"))
+    (is (str/includes? html "1-EURUSD"))
+    (is (str/includes? html "hedge"))
+    (is (str/includes? html "\"Y\""))))
+
+(deftest order-and-fill-position-id-render-test
+  (let [order-html (pr-str (orders-view/orders-table
+                            [(sample-order "o1" 1 "EURUSD" nil)]))
+        fill-html (pr-str (trades-view/fill-table
+                           [(sample-fill "f1" "o1" 1 "EURUSD" nil)]))]
+    (is (str/includes? order-html "p-o1"))
+    (is (str/includes? fill-html "p-o1"))))

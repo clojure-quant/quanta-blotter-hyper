@@ -2,7 +2,7 @@
   (:require
    [datahike.api :refer [q]]
    [hyper.core :as h]
-   [quanta.blotter.oms.flow.working-orders :as working-orders]
+   [quanta.blotter.oms.portfolio.working-order :as working-order]
    [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter-hyper.view.common :as common]))
@@ -29,7 +29,7 @@
    (common/fmt-cell status)])
 
 (defn- cancel-order-cell [order {:keys [oms error-a]}]
-  (let [done? (working-orders/order-done? order)]
+  (let [done? (working-order/order-done? order)]
     [:td
      [:button.send-order-cancel
       (cond-> {:type "button"}
@@ -43,7 +43,7 @@
   ([orders cancel-opts]
    (let [orders (sort-by :order/date #(compare %2 %1) orders)
          cancel? (some? cancel-opts)
-         col-count (if cancel? 18 17)]
+         col-count (if cancel? 19 18)]
      [:div.orders-table-wrap
       [:table.orders-table
        [:thead
@@ -55,6 +55,7 @@
          [:th "camp"]
          [:th "lbl"]
          [:th "id"]
+         [:th "position-id"]
          [:th "asset"]
          [:th.side-col "D"]
          [:th.num "qty"]
@@ -78,6 +79,7 @@
              [:td (common/fmt-cell (:order/campaign order))]
              [:td (common/fmt-cell (:order/label order))]
              [:td (common/fmt-cell (:order/id order))]
+             [:td (common/fmt-cell (:order/position-id order))]
              [:td (common/fmt-cell (:order/asset order))]
              (common/side-cell (:order/side order))
              [:td.num (common/fmt-cell (:order/qty order))]

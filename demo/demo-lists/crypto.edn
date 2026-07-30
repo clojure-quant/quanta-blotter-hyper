@@ -1,2 +1,9 @@
 {:lists/name "crypto"
- :lists/asset ["BTCUSDT.S.BB" "ETHUSDT.S.BB" "BTCUSDT.LF.BB" "ETHUSDT.LF.BB"]}
+ :lists/asset ["BTCUSDT.S.BB"
+               "ETHUSDT.S.BB"
+               "BTCUSDT.LF.BB"
+               "ETHUSDT.LF.BB"
+               "SOLUSDT.S.BB"
+               "XRPUSDT.S.BB"
+               "SOLUSDT.LF.BB"
+               "XRPUSDT.LF.BB"]}
