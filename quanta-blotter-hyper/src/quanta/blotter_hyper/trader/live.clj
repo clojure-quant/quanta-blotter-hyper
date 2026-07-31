@@ -2,7 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
    [quanta.blotter.oms.server :as oms-server]
    [quanta.blotter-hyper.trader.send-order :as send-order]
    [quanta.blotter-hyper.view.orders :as orders-view]

@@ -1,7 +1,7 @@
 (ns demo.test-order-sender
   (:require
    [missionary.core :as m]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
    [quanta.blotter.oms.core :refer [send-test-order]]))
 
 (defn start-order-poller

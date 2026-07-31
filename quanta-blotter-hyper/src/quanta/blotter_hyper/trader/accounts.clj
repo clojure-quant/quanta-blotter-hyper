@@ -2,7 +2,8 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
+   [quanta.blotter-hyper.view.account-status :as account-status]
    [quanta.blotter-hyper.view.accounts :as accounts-view]
    [quanta.blotter.oms.db :as db]))
 
@@ -49,7 +50,9 @@
   (h/view
    {:mount (fn []
              (let [db (:db env)
+                   oms-server (:oms-server env)
                    _ (assert db ":db needs to be in :ctx")
+                   _ (assert oms-server ":oms-server needs to be in :ctx")
                    identity @(h/session-cursor :identity)
                    trader (name (:user identity))
                    data-a (atom nil)
@@ -60,6 +63,7 @@
                    settings-dialog-a (atom nil)
                    settings-text-a (atom "")
                    settings-error-a (atom nil)
+                   status-dialog-a (atom nil)
                    query-f (m/watch query-a)
                    this {:data-a data-a
                          :api-a api-a
@@ -69,6 +73,8 @@
                          :settings-dialog-a settings-dialog-a
                          :settings-text-a settings-text-a
                          :settings-error-a settings-error-a
+                         :status-dialog-a status-dialog-a
+                         :oms-server oms-server
                          :trader trader
                          :db db
                          :dispose! (start-query-processor db query-f data-a)}]
@@ -78,9 +84,11 @@
                (h/watch! settings-dialog-a)
                (h/watch! settings-text-a)
                (h/watch! settings-error-a)
+               (h/watch! status-dialog-a)
                this))
     :render (fn [{:keys [data-a api-a query-a editing-a edit-value-a
                          settings-dialog-a settings-text-a settings-error-a
+                         status-dialog-a oms-server
                          trader db]} _req]
               [:motion.div.accounts-page
                ((:trader/nav env))
@@ -94,6 +102,13 @@
                                                   :settings-dialog-a settings-dialog-a
                                                   :settings-text-a settings-text-a
                                                   :settings-error-a settings-error-a
+                                                  :status-dialog (account-status/dialog status-dialog-a)
+                                                  :status-btn-fn
+                                                  (fn [account]
+                                                    (account-status/status-button
+                                                     account
+                                                     {:oms-server oms-server
+                                                      :status-dialog-a status-dialog-a}))
                                                   :db db
                                                   :query-a query-a
                                                   :asset-lists (:asset-lists data)})

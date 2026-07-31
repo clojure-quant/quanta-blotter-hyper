@@ -283,7 +283,7 @@
     "settings"]])
 
 (defn- account-row
-  [account {:keys [show-trader? editable?] :as opts}]
+  [account {:keys [show-trader? editable? status-btn-fn] :as opts}]
   [:tr {:key (:account/id account)}
    (when show-trader?
      [:td (common/fmt-cell (:account/trader account))])
@@ -304,7 +304,9 @@
      [:td (common/fmt-cell (account-asset-list-name account))])
    (if editable?
      (account-settings-cell account opts)
-     [:td.settings (fmt-settings (:account/settings account))])])
+     [:td.settings (fmt-settings (:account/settings account))])
+   (when status-btn-fn
+     [:td.status (status-btn-fn account)])])
 
 (defn accounts-table
   ([accounts]
@@ -312,6 +314,7 @@
   ([accounts opts]
    (let [{:keys [show-trader? editable? editing-a edit-value-a
                  settings-dialog-a settings-text-a settings-error-a
+                 status-btn-fn status-dialog
                  db query-a asset-lists]
           :or {show-trader? false
                asset-lists []}} opts
@@ -325,16 +328,20 @@
                               :db db
                               :query-a query-a
                               :asset-lists asset-lists
-                              :editable? true))
+                              :editable? true)
+                       status-btn-fn
+                       (assoc :status-btn-fn status-btn-fn))
          dialog-opts (select-keys table-opts [:settings-dialog-a :settings-text-a
                                               :settings-error-a :db :query-a])
          sort-key (if show-trader?
                     (juxt :account/trader :account/id)
                     :account/id)
          accounts (sort-by sort-key accounts)
-         cols (if show-trader? 9 8)]
+         cols (cond-> (if show-trader? 9 8)
+                status-btn-fn inc)]
      [:div.orders-table-wrap
       (when editable? (account-settings-dialog dialog-opts))
+      status-dialog
       [:table.orders-table
        [:thead
         [:tr
@@ -346,7 +353,8 @@
          [:th "enabled"]
          [:th "api type"]
          [:th "asset-list"]
-         [:th "settings"]]]
+         [:th "settings"]
+         (when status-btn-fn [:th "status"])]]
        [:tbody
         (if (empty? accounts)
           [:tr [:td {:colspan cols} "No accounts"]]

@@ -1,7 +1,7 @@
 (ns playground.notification.simulate
   (:require
    [missionary.core :as m]
-   [quanta.blotter-hyper.missionary :refer [start-task!]])
+   [quanta.missionary.task-timbre :refer [start-task!]])
   (:import [java.time Instant]
            [java.time.format DateTimeFormatter]))
 

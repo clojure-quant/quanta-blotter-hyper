@@ -2,7 +2,7 @@
   "Server instant pushed over SSE (~1 Hz) for connection health checks."
   (:require
    [missionary.core :as m]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
    [tick.core :as t]))
 
 (def server-time-a (atom nil))

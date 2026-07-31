@@ -2,7 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
    [quanta.blotter-hyper.view.assets :as assets-view]))
 
 (defn- process-query [db-conn _query]

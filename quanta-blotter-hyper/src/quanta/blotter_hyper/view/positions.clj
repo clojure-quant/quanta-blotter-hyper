@@ -33,6 +33,7 @@
         [:th "asset"]
         [:th.side-col "D"]
         [:th.num "qty-in"]
+        [:th.num "qty-out"]
         [:th.num "avg-in"]
         [:th.num "avg-out"]
         [:th.num "pl"]
@@ -40,7 +41,7 @@
         [:th.time "close"]]]
       [:tbody
        (if (empty? positions)
-         [:tr [:td {:colspan 14} "No positions"]]
+         [:tr [:td {:colspan 15} "No positions"]]
          (for [pos positions]
            [:tr {:key (or (:position/position-id pos)
                           (str (:position/account pos) "-"
@@ -55,6 +56,7 @@
             [:td (common/fmt-cell (:position/asset pos))]
             (common/side-cell (:position/side pos))
             [:td.num (common/fmt-cell (:position/qty-entry pos))]
+            [:td.num (common/fmt-cell (:position/qty-exit pos))]
             [:td.num (when-let [v (:position/average-entry-price pos)] (str v))]
             [:td.num (when-let [v (:position/avg-exit-price pos)] (str v))]
             [:td.num (when-let [v (:position/realized-pl pos)] (str v))]

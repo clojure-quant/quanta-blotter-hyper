@@ -2,7 +2,7 @@
   (:require
    [missionary.core :as m]
    [hyper.core :as h]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
    [quanta.blotter-hyper.component.instant :as instant]
    [quanta.blotter-hyper.view.common :as common]
    [quanta.blotter-hyper.view.orders :as orders-view]

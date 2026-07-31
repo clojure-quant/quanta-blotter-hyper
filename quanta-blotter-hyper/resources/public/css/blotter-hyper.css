@@ -610,7 +610,8 @@ instant-input {
 .accounts-header select,
 .account-asset-list-cell select,
 .accounts-add,
-.account-settings-btn {
+.account-settings-btn,
+.account-status-btn {
   font-size: 0.8rem;
   padding: 0.2rem 0.4rem;
   background: #2a2a4a;
@@ -620,7 +621,8 @@ instant-input {
 }
 
 .accounts-add,
-.account-settings-btn {
+.account-settings-btn,
+.account-status-btn {
   cursor: pointer;
 }
 
@@ -795,6 +797,76 @@ instant-input {
 .account-settings-save:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+.account-status-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.account-status-dialog {
+  width: min(72rem, 100%);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  overflow: auto;
+  background: #1a1a2e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.account-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.account-status-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.account-status-close {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 3px;
+  border: 1px solid #444;
+  cursor: pointer;
+  background: #2a2a4a;
+  color: #eee;
+}
+
+.account-status-waiting,
+.account-status-timeout {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.account-status-timeout {
+  color: #ffb347;
+}
+
+.account-status-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.account-status-section h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .live-header {

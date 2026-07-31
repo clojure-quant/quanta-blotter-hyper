@@ -6,7 +6,7 @@
    [quanta.asset.schema]
    [quanta.asset.seed]
    [quanta.blotter.oms.db]
-   [quanta.blotter-hyper.missionary :refer [start-task!]]
+   [quanta.missionary.task-timbre :refer [start-task!]]
    [quanta.quote.core :refer [create-quote-manager create-quotelist-consumer]]
    [taoensso.timbre :refer [info]]))
 
